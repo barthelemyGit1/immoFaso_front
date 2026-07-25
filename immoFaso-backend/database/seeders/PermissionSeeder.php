@@ -6,7 +6,9 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-
+/**
+ * Seeder pour les permissions
+ */
 class PermissionSeeder extends Seeder
 {
     public function run(): void
@@ -27,10 +29,10 @@ class PermissionSeeder extends Seeder
             Permission::create(['name' => $permission]);
         }
 
-        // Créer les rôles
-        $locataire = Role::create(['name' => 'locataire']);
-        $proprietaire = Role::create(['name' => 'proprietaire']);
-        $admin = Role::create(['name' => 'admin']);
+        // Recupérer ou créer les rôles
+        $admin = Role::findOrCreate("ADMIN","web");
+        $locataire = Role::findOrCreate("LOCATAIRE","api");
+        $proprietaire = Role::findOrCreate("PROPRIETAIRE","api");
 
         // Assigner les permissions aux rôles
         $locataire->givePermissionTo([
