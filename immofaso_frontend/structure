@@ -1,0 +1,99 @@
+# ImmoFaso — Inventaire des écrans à prototyper (Figma)
+
+Ce document liste les écrans à concevoir pour chaque profil, dans l'ordre logique du parcours utilisateur. Il sert de check-list pour structurer ton fichier Figma.
+
+## Organisation suggérée du fichier Figma
+
+Utilise le panneau **Pages** de Figma (les onglets à gauche) pour séparer les univers :
+
+| Page Figma | Contenu |
+|---|---|
+| 🎨 Design System | Couleurs, typographie, composants (boutons, champs, cartes, badges de statut) |
+| 📱 Locataire | Tous les écrans du profil Locataire |
+| 📱 Propriétaire | Tous les écrans du profil Propriétaire |
+| 🖥️ Admin (Web) | Tous les écrans du back-office |
+| 🔄 Flows | Copies des écrans reliées par des connexions (prototype cliquable) |
+
+Commence toujours par le **Design System** avant les écrans : ça évite de refaire les boutons/champs sur chaque frame.
+
+---
+
+## 1. Écrans transverses (communs à tous les profils)
+
+Ces écrans sont vus avant que l'utilisateur choisisse ou active un profil.
+
+| # | Écran | Objectif | Éléments clés |
+|---|---|---|---|
+| T1 | Splash screen | Chargement initial, identité de marque | Logo, couleur de fond, indicateur de chargement |
+| T2 | Onboarding (2-3 slides) | Présenter la valeur de l'app | Illustration, titre, texte court, bouton « Suivant » |
+| T3 | Choix du profil | Locataire ou Propriétaire (EF-05/06) | 2 grandes cartes cliquables, possibilité de basculer plus tard |
+| T4 | Inscription (téléphone) | Créer un compte | Champ téléphone, mot de passe, CGU |
+| T5 | Vérification OTP | Valider le numéro | 6 cases de saisie, compte à rebours, bouton renvoyer |
+| T6 | Connexion | Se connecter | Téléphone/email + mot de passe, lien « mot de passe oublié » |
+| T7 | Mot de passe oublié | Réinitialisation via SMS | Champ téléphone, confirmation d'envoi |
+| T8 | Centre de notifications | Historique des notifications | Liste groupée par date, badge non-lu |
+| T9 | Profil / Mon compte | Voir et modifier ses infos | Photo, nom, téléphone, langue, bouton déconnexion |
+| T10 | Paramètres | Préférences app | Mode économie de données, notifications push on/off |
+| T11 | États vides / erreurs | Cas « aucun résultat », « pas de connexion », erreur serveur | Illustration + message + action de reprise |
+
+---
+
+## 2. Profil Locataire
+
+| # | Écran | Objectif | Éléments clés |
+|---|---|---|---|
+| L1 | Accueil | Point d'entrée, recherche rapide | Barre de recherche, catégories rapides, annonces suggérées/récentes |
+| L2 | Recherche & filtres | Affiner une recherche (EF-20/21) | Ville, quartier, type, prix min/max, équipements, bouton « Voir X résultats » |
+| L3 | Résultats — Liste | Parcourir les annonces | Cartes annonce (photo, prix, quartier, type), tri, bascule vers carte |
+| L4 | Résultats — Carte | Explorer géographiquement (EF-23) | Carte OpenStreetMap, pins cliquables, aperçu au tap |
+| L5 | Détail logement | Décider de contacter le propriétaire | Carousel photos, prix, description, équipements, mini-carte, bouton « Contacter », note moyenne, bouton favori/signaler |
+| L6 | Messagerie — Liste conversations | Retrouver ses échanges | Liste par annonce, dernier message, badge non-lu |
+| L7 | Messagerie — Conversation | Échanger en temps réel (EF-30/31) | Fil de messages, champ de saisie, statut lu/envoyé |
+| L8 | Favoris | Retrouver les logements sauvegardés | Grille/liste de cartes annonce, retrait rapide |
+| L9 | Alertes de recherche | Être notifié de nouvelles annonces (US-L07) | Liste des alertes actives, création (mêmes filtres que L2), toggle actif/inactif |
+| L10 | Ajouter un avis | Noter un logement/propriétaire (EF-40) | Sélecteur d'étoiles, champ commentaire |
+| L11 | Signaler | Signaler une annonce/un utilisateur (EF-34) | Liste de motifs, champ commentaire libre |
+
+---
+
+## 3. Profil Propriétaire
+
+| # | Écran | Objectif | Éléments clés |
+|---|---|---|---|
+| P1 | Tableau de bord | Vue d'ensemble de l'activité | KPIs (vues, messages non lus, annonces actives), raccourci « Publier » |
+| P2 | Mes annonces | Gérer son portefeuille d'annonces | Liste avec badge de statut (en attente/validée/rejetée/louée), actions rapides |
+| P3 | Publier une annonce — Étape 1 | Infos générales | Type de logement, titre, description |
+| P4 | Publier une annonce — Étape 2 | Localisation | Ville, quartier, carte pour placer le point GPS |
+| P5 | Publier une annonce — Étape 3 | Photos | Upload jusqu'à 10 photos, réorganisation, photo de couverture |
+| P6 | Publier une annonce — Étape 4 | Prix & équipements | Loyer mensuel, checklist équipements (eau, électricité, clim, wifi…) |
+| P7 | Publier une annonce — Récapitulatif | Vérifier avant envoi | Aperçu façon fiche L5, bouton « Publier » (statut → en attente) |
+| P8 | Détail annonce (vue propriétaire) | Suivre une annonce publiée | Statistiques de vues, statut de modération, motif de rejet si refusée, bouton modifier |
+| P9 | Changer le statut | Marquer disponible/loué/suspendu (EF-16) | Sélecteur de statut avec confirmation |
+| P10 | Messagerie | Identique à L6/L7, adapté au contexte propriétaire | — |
+| P11 | Avis reçus | Consulter sa réputation | Note moyenne, liste des avis reçus |
+
+---
+
+## 4. Back-office Administrateur (Web)
+
+| # | Écran | Objectif | Éléments clés |
+|---|---|---|---|
+| A1 | Connexion admin + 2FA | Sécuriser l'accès (§8.1) | Identifiants + code de vérification |
+| A2 | Dashboard | Vue d'ensemble de la plateforme | KPIs globaux (utilisateurs, annonces, messages, signalements en attente) |
+| A3 | File de modération | Valider/rejeter les annonces (EF-14/15) | Tableau filtrable par statut, panneau de détail latéral, motif de rejet |
+| A4 | Gestion des utilisateurs | Administrer les comptes (US-A02) | Tableau avec recherche, filtre par rôle/statut, action suspendre/réactiver |
+| A5 | Gestion des signalements | Traiter les signalements (EF-34) | Liste par motif/statut, lien vers l'annonce ou l'utilisateur concerné |
+| A6 | Zones géographiques | CRUD villes/quartiers | Tableau + formulaire d'ajout/modification |
+| A7 | Statistiques avancées | Analyser l'usage | Graphiques (annonces par ville, taux de conversion, temps de modération moyen) |
+| A8 | Notifications globales | Communiquer avec les utilisateurs | Formulaire de campagne (titre, message, cible) |
+| A9 | Gestion des comptes admin | Gérer les droits internes | Liste des admins, ajout/retrait |
+
+---
+
+## Priorisation suggérée pour le prototype
+
+1. **Vague 1 (parcours critique)** : T1–T6, L1–L5, P1–P7, A1–A3 → couvre inscription, recherche, publication, modération.
+2. **Vague 2 (engagement)** : L6–L9, P8–P10, A4–A5 → messagerie, favoris, alertes, gestion utilisateurs.
+3. **Vague 3 (finitions)** : T7–T11, L10–L11, P11, A6–A9 → avis, signalements, paramètres avancés.
+
+Cette priorisation te permet d'avoir un prototype cliquable démontrable dès la vague 1, avant d'enrichir avec les vagues suivantes.

@@ -1,0 +1,68 @@
+name: immofaso_frontend
+description: "ImmoFaso - Plateforme immobilière pour Bobo-Dioulasso"
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^3.0.0
+
+  # Navigation
+  go_router: ^17.3.0
+
+  # Réseau
+  dio: ^5.4.3
+  pretty_dio_logger: ^1.3.1
+
+  # Stockage sécurisé (JWT, refresh token)
+  flutter_secure_storage: ^10.3.1
+
+  # Modèles / sérialisation
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
+
+  # UI / UX
+  google_fonts: ^8.2.0
+  pin_code_fields: ^9.0.0         # écran OTP (API MaterialPinField depuis la v9)
+  flutter_svg: ^2.0.10+1
+  intl: ^0.20.3                  # formats FR (dates, montants FCFA)
+
+   # Carte (OpenStreetMap — pas de clé API nécessaire)
+  flutter_map: ^8.3.1
+  latlong2: ^0.10.1
+  
+  # Validation de formulaires
+  form_field_validator: ^1.1.0
+
+  # Utilitaires
+  equatable: ^2.0.5
+  connectivity_plus: ^7.3.1
+
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.11
+  freezed: ^3.2.5
+  json_serializable: ^6.8.0
+
+flutter:
+
+  uses-material-design: true
+  #assets:
+  #  - assets/images/
+  #  - assets/icons/
+  
