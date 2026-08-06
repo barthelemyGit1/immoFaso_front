@@ -4,7 +4,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/annonce_model.dart';
 import '../../../shared/widgets/async_value_view.dart';
 import '../providers/annonce_providers.dart';
-import '../widgets/annonce_card.dart';
+import '../../../../shared/widgets/annonce_card.dart';
 import 'annonce_detail_screen.dart';
 import 'tabs/recherche_tab.dart';
 

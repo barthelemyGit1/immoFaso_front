@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../shared/models/annonce_model.dart';
+import '../../core/theme/app_theme.dart';
+import '../models/annonce_model.dart';
 
 /// Carte compacte représentant une annonce dans une liste (accueil,
 /// résultats de recherche, favoris).

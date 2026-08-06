@@ -1,3 +1,37 @@
+/// Statut de modération d'une annonce — cf. workflow de validation admin
+/// du document de conception (entité ANNONCE.statut).
+enum StatutAnnonce { enAttente, validee, rejetee, louee }
+
+extension StatutAnnonceX on StatutAnnonce {
+  String get label => switch (this) {
+        StatutAnnonce.enAttente => 'En attente',
+        StatutAnnonce.validee => 'Validée',
+        StatutAnnonce.rejetee => 'Rejetée',
+        StatutAnnonce.louee => 'Louée',
+      };
+
+  String get apiValue => switch (this) {
+        StatutAnnonce.enAttente => 'EN_ATTENTE',
+        StatutAnnonce.validee => 'VALIDEE',
+        StatutAnnonce.rejetee => 'REJETEE',
+        StatutAnnonce.louee => 'LOUEE',
+      };
+
+  static StatutAnnonce fromApiValue(String? value) {
+    switch (value?.toUpperCase()) {
+      case 'VALIDEE':
+        return StatutAnnonce.validee;
+      case 'REJETEE':
+        return StatutAnnonce.rejetee;
+      case 'LOUEE':
+        return StatutAnnonce.louee;
+      case 'EN_ATTENTE':
+      default:
+        return StatutAnnonce.enAttente;
+    }
+  }
+}
+
 /// Type de logement — correspond aux catégories du dictionnaire de données
 /// (entité ANNONCE.typeLogement) et aux filtres de recherche.
 enum TypeLogement { villa, appartement, studio, chambre }
@@ -77,6 +111,9 @@ class Annonce {
     this.longitude,
     this.proprietaireNote,
     this.isFavori = false,
+    this.statut = StatutAnnonce.enAttente,
+    this.vues = 0,
+ 
   });
 
   final String id;
@@ -95,7 +132,9 @@ class Annonce {
   final double? longitude;
   final double? proprietaireNote;
   final bool isFavori;
-
+  // ... et dans les champs :
+  final StatutAnnonce statut;
+  final int vues;
   String get localisation => '$quartier, $ville';
 
   /// Ex: "70 000 F CFA/mois"
@@ -131,6 +170,8 @@ class Annonce {
       longitude: (json['longitude'] as num?)?.toDouble(),
       proprietaireNote: (json['proprietaireNote'] as num?)?.toDouble(),
       isFavori: json['isFavori'] as bool? ?? false,
+      statut: StatutAnnonceX.fromApiValue(json['statut'] as String?),
+      vues: json['vues'] as int? ?? 0,
     );
   }
 
@@ -152,6 +193,8 @@ class Annonce {
       longitude: longitude,
       proprietaireNote: proprietaireNote,
       isFavori: isFavori ?? this.isFavori,
+      statut: statut,
+      vues: vues,
     );
   }
 }

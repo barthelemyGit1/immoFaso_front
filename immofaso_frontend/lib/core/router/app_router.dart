@@ -11,6 +11,7 @@ import '../../features/onboarding/providers/onboarding_provider.dart';
 import '../../features/onboarding/screens/onboarding_screen.dart';
 import '../../features/locataire/screens/locataire_shell.dart';
 import '../constants/app_constants.dart';
+import '../../features/proprietaire/screens/proprietaire_shell.dart';
 
 /// Routes nommées, centralisées pour éviter les chaînes de caractères
 /// éparpillées dans les écrans.
@@ -110,7 +111,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.proprietaireHome,
-        builder: (_, __) => const _RoleHomePlaceholder(title: 'Espace Propriétaire'),
+        builder: (_, __) => const ProprietaireShell(),
       ),
       GoRoute(
         path: AppRoutes.adminHome,

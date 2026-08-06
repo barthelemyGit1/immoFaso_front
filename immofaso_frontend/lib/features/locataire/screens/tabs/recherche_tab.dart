@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/models/annonce_model.dart';
 import '../../providers/annonce_providers.dart';
-import '../../widgets/brand_header.dart';
+import '../../../../shared/widgets/brand_header.dart';
 import '../../widgets/golden_search_field.dart';
 import '../resultats_recherche_screen.dart';
+
 
 /// Écran "Filtrer" de la maquette, utilisé comme contenu de l'onglet
 /// Recherche : critères puis lancement vers les résultats.

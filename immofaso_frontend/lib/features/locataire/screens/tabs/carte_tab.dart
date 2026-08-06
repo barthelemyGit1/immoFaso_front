@@ -6,7 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/models/annonce_model.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../providers/annonce_providers.dart';
-import '../../widgets/brand_header.dart';
+import '../../../../shared/widgets/brand_header.dart';
 import '../annonce_detail_screen.dart';
 
 /// Écran "Maps" de la maquette. Utilise OpenStreetMap via flutter_map

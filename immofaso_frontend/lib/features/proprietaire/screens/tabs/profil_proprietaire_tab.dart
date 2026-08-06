@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../auth/providers/auth_provider.dart';
 import '../../../../shared/widgets/brand_header.dart';
+import '../../../auth/providers/auth_provider.dart';
+import '../../providers/proprietaire_providers.dart';
 
-class ProfilTab extends ConsumerWidget {
-  const ProfilTab({super.key});
+class ProfilProprietaireTab extends ConsumerWidget {
+  const ProfilProprietaireTab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authControllerProvider);
     final user = authState is AuthAuthenticated ? authState.user : null;
+    final stats = ref.watch(dashboardStatsProvider);
 
     return SafeArea(
       bottom: false,
@@ -26,9 +28,22 @@ class ProfilTab extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(user?.nomComplet ?? '', style: Theme.of(context).textTheme.titleLarge),
           Text(user?.telephone ?? '', style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: 6),
+          stats.when(
+            data: (s) => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.star_rounded, size: 16, color: AppColors.warning),
+                const SizedBox(width: 4),
+                Text('${s.noteMoyenne.toStringAsFixed(1)} / 5', style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
           const SizedBox(height: 24),
-          _ProfilTile(icon: Icons.favorite_border, label: 'Mes favoris', onTap: () {}),
-          _ProfilTile(icon: Icons.description_outlined, label: 'Mes demandes envoyées', onTap: () {}),
+          _ProfilTile(icon: Icons.home_work_outlined, label: 'Mes annonces', onTap: () {}),
+          _ProfilTile(icon: Icons.description_outlined, label: 'Demandes reçues', onTap: () {}),
           _ProfilTile(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {}),
           _ProfilTile(icon: Icons.settings_outlined, label: 'Paramètres', onTap: () {}),
           const Spacer(),

@@ -4,12 +4,14 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/models/conversation_model.dart';
 import '../../../../shared/widgets/async_value_view.dart';
+import '../../../../shared/widgets/brand_header.dart';
 import '../../../messagerie/providers/conversation_providers.dart';
 import '../../../messagerie/screens/conversation_screen.dart';
-import '../../../../shared/widgets/brand_header.dart';
 
-class MessagesTab extends ConsumerWidget {
-  const MessagesTab({super.key});
+/// Écran "Chat" côté propriétaire : liste des conversations avec les
+/// locataires intéressés par ses annonces.
+class MessagesProprietaireTab extends ConsumerWidget {
+  const MessagesProprietaireTab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,7 +29,7 @@ class MessagesTab extends ConsumerWidget {
               isEmpty: (list) => list.isEmpty,
               emptyIcon: Icons.chat_bubble_outline_rounded,
               emptyTitle: 'Aucune conversation',
-              emptyMessage: 'Contactez un propriétaire depuis une annonce pour démarrer une discussion.',
+              emptyMessage: 'Les locataires intéressés par vos annonces apparaîtront ici.',
               data: (context, list) => ListView.separated(
                 itemCount: list.length,
                 separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.border),
