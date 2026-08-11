@@ -26,7 +26,7 @@ dependencies:
   pretty_dio_logger: ^1.3.1
 
   # Stockage sécurisé (JWT, refresh token)
-  flutter_secure_storage: ^10.3.1
+  flutter_secure_storage: ^11.0.0
 
   # Modèles / sérialisation
   freezed_annotation: ^3.1.0

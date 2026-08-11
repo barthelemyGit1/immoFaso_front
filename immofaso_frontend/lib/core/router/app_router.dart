@@ -22,8 +22,8 @@ class AppRoutes {
   static const onboarding = '/onboarding';
   static const login = '/login';
   static const register = '/register';
-  static const otpVerification = '/otp-verification';
-  static const forgotPassword = '/forgot-password';
+  static const otpVerification = '/verify-otp';
+  static const forgotPassword = '/password-reset';
 
   // Racines par rôle — chaque feature branchera ses sous-routes ici
   // (ex: /locataire/home, /locataire/annonce/:id, ...).

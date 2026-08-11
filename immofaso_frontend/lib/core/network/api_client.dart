@@ -48,13 +48,14 @@ class ApiClient {
   Future<String?>? _refreshing;
 
   Dio get raw => _dio;
+// Routes publiques (routes/auth.php), qui n'exigent pas de token Sanctum.
+  static const _publicPaths = ['/register', '/login', '/verify-otp', '/resend-otp', '/password-reset'];
 
   InterceptorsWrapper _authInterceptor() {
     return InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // CA-AUTH: pas de token requis sur les routes publiques d'auth.
-        final isAuthRoute = options.path.startsWith('/auth/');
-        if (!isAuthRoute) {
+       final isPublicRoute = _publicPaths.any((p) => options.path.startsWith(p));
+        if (!isPublicRoute) {
           final token = await _storage.accessToken;
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
@@ -63,8 +64,8 @@ class ApiClient {
         handler.next(options);
       },
       onError: (error, handler) async {
-        final isAuthRoute = error.requestOptions.path.startsWith('/auth/');
-        if (error.response?.statusCode == 401 && !isAuthRoute) {
+        final isPublicRoute = _publicPaths.any((p) => error.requestOptions.path.startsWith(p));
+        if (error.response?.statusCode == 401 && !isPublicRoute) {
           final newToken = await _refreshAccessToken();
           if (newToken != null) {
             final retryRequest = error.requestOptions;

@@ -80,7 +80,7 @@ class AuthController extends Notifier<AuthState> {
     state = user != null ? AuthAuthenticated(user) : const AuthUnauthenticated();
   }
 
-  Future<void> login({required String telephone, required String password,  UserRole roleMock = UserRole.locataire,}) async {
+  Future<void> login({required String telephone, required String password}) async {
     state = const AuthLoading();
     try {
       final result = await _repository.login(telephone: telephone, password: password);

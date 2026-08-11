@@ -227,7 +227,7 @@ class _EquipementBadge extends StatelessWidget {
   IconData get _icon => switch (equipement) {
         Equipement.eau => Icons.water_drop_outlined,
         Equipement.electricite => Icons.bolt_outlined,
-        Equipement.internet => Icons.wifi_outlined,
+        Equipement.ventilation => Icons.air_outlined,
         Equipement.climatisation => Icons.ac_unit_outlined,
         Equipement.wifi => Icons.router_outlined,
       };

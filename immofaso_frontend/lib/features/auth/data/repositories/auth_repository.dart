@@ -13,15 +13,15 @@ class AuthResult {
 }
 
 /// Regroupe tous les appels réseau liés à l'authentification.
-/// Correspond aux endpoints CA-AUTH-xx du contrat API :
-///   POST /auth/register
-///   POST /auth/otp/verify
-///   POST /auth/otp/resend
-///   POST /auth/login
-///   POST /auth/refresh
-///   POST /auth/forgot-password
-///   POST /auth/reset-password
-///   POST /auth/logout
+/// Correspond aux routes Laravel de `routes/auth.php` (préfixées `/v1`,
+/// elles-mêmes sous le préfixe `/api` de `routes/api.php`) :
+///   POST /register
+///   POST /verify-otp
+///   POST /resend-otp
+///   POST /password-reset
+///   POST /password-reset/confirm
+///   POST /login
+///   GET  /users/me           (routes/api.php, protégée par auth:sanctum)
 class AuthRepository {
   AuthRepository({required ApiClient apiClient, required SecureStorageService storage})
       : _api = apiClient,
@@ -42,11 +42,12 @@ class AuthRepository {
     String? email,
   }) async {
     try {
-      await _api.raw.post('/auth/register', data: {
+      await _api.raw.post('/register', data: {
         'nom': nom,
         'prenom': prenom,
         'telephone': telephone,
         'password': password,
+        'password_confirmation': password,
         'role': role.apiValue,
         if (email != null && email.isNotEmpty) 'email': email,
       });
@@ -64,9 +65,9 @@ class AuthRepository {
     required String otpCode,
   }) async {
     try {
-      final response = await _api.raw.post('/auth/otp/verify', data: {
+      final response = await _api.raw.post('/verify-otp', data: {
         'telephone': telephone,
-        'code': otpCode,
+        'otp': otpCode,
       });
       return _persistAndReturnSession(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
@@ -76,7 +77,7 @@ class AuthRepository {
 
   Future<void> resendOtp({required String telephone}) async {
     try {
-      await _api.raw.post('/auth/otp/resend', data: {'telephone': telephone});
+      await _api.raw.post('/resend-otp', data: {'telephone': telephone});
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
@@ -87,11 +88,11 @@ class AuthRepository {
     required String telephone,
     required String password,
   }) async {
-    if (AppConstants.useMockAuth) {
+    /*if (AppConstants.useMockAuth) {
       return _mockLogin(telephone: telephone);
-    }
+    }*/
     try {
-      final response = await _api.raw.post('/auth/login', data: {
+      final response = await _api.raw.post('/login', data: {
         'telephone': telephone,
         'password': password,
       });
@@ -105,9 +106,9 @@ class AuthRepository {
   /// aucun appel réseau. Permet de continuer à construire les écrans
   /// (dashboard locataire, etc.) avant que le back-end soit disponible.
   /// ⚠️ À retirer quand `AppConstants.useMockAuth` repasse à `false`.
-  Future<AuthResult> _mockLogin({required String telephone}) async {
+  /*Future<AuthResult> _mockLogin({required String telephone}) async {
     await Future.delayed(const Duration(milliseconds: 400)); // simule la latence réseau
-    final user = UserModel.demo(UserRole.locataire);
+    //final user = UserModel.demo(UserRole.locataire);
 
     await _storage.saveSession(
       accessToken: 'mock-access-token',
@@ -118,11 +119,11 @@ class AuthRepository {
     await _storage.saveCachedUserJson(user.toJson());
 
     return AuthResult(user: user, accessToken: 'mock-access-token', refreshToken: 'mock-refresh-token');
-  }
+  }*/
 
   Future<void> forgotPassword({required String telephone}) async {
     try {
-      await _api.raw.post('/auth/forgot-password', data: {'telephone': telephone});
+      await _api.raw.post('/password-reset', data: {'telephone': telephone});
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
@@ -134,9 +135,9 @@ class AuthRepository {
     required String newPassword,
   }) async {
     try {
-      await _api.raw.post('/auth/reset-password', data: {
+      await _api.raw.post('/password-reset/confirm', data: {
         'telephone': telephone,
-        'code': otpCode,
+        'otp': otpCode,
         'newPassword': newPassword,
       });
     } on DioException catch (e) {
@@ -147,7 +148,7 @@ class AuthRepository {
   Future<void> logout() async {
     if (!AppConstants.useMockAuth) {
       try {
-        await _api.raw.post('/auth/logout');
+        await _api.raw.post('/logout');
       } on DioException {
         // Non bloquant : on nettoie la session locale même si l'appel échoue.
       }
@@ -166,18 +167,27 @@ class AuthRepository {
     }
 
     try {
-      final response = await _api.raw.get('/auth/me');
+      final response = await _api.raw.get('/user/me');
       return UserModel.fromJson(response.data as Map<String, dynamic>);
     } on DioException {
       return null;
     }
   }
 
-  Future<AuthResult> _persistAndReturnSession(Map<String, dynamic> data) async {
-    final user = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-    final accessToken = data['accessToken'] as String;
-    final refreshToken = data['refreshToken'] as String;
+  Future<AuthResult> _persistAndReturnSession(Map<String, dynamic> responseBody) async {
 
+    final data = responseBody['data'] as Map<String, dynamic>? ?? responseBody;
+  
+    final userJson = data['user'] as Map<String, dynamic>;
+    final user = UserModel.fromJson(userJson);
+
+    // 3. Extraire le token
+    final accessToken = (data['token'] ?? data['accessToken'] ?? '') as String;
+
+    // 4. Gestion sécurisée de refreshToken (mettre une chaîne vide si absent)
+    final refreshToken = (data['refreshToken'] ?? data['refresh_token'] ?? '') as String;
+
+    // 5. Sauvegarder la session
     await _storage.saveSession(
       accessToken: accessToken,
       refreshToken: refreshToken,

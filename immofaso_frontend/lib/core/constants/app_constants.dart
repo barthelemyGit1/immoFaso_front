@@ -7,17 +7,17 @@ class AppConstants {
   /// font aucun appel réseau réel et simulent directement une session
   /// (utile tant que le back-end Node.js n'est pas branché).
   /// Repasser à `false` avant de connecter le vrai back-end.
-  static const bool useMockAuth = true;
+  static const bool useMockAuth = false;
 
   // Idéalement injecté via --dart-define plutôt qu'en dur ici.
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://api.immofaso.bf/v1',
+    defaultValue: 'http://10.0.2.2:8000/api/v1',
   );
 
   static const String socketUrl = String.fromEnvironment(
     'SOCKET_URL',
-    defaultValue: 'https://api.immofaso.bf',
+    defaultValue: 'http://10.0.2.2:8000',
   );
 
   // Stockage sécurisé - clés
@@ -38,7 +38,7 @@ class AppConstants {
 
 /// Rôles utilisateur — doit rester synchronisé avec l'enum UTILISATEUR.role
 /// côté back-end (cf. document de conception).
-enum UserRole{locataire, proprietaire, admin}
+enum UserRole { locataire, proprietaire, admin }
 
 extension UserRoleX on UserRole {
   String get apiValue => switch (this) {

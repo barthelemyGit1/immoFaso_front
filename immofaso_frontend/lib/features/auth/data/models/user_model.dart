@@ -27,21 +27,24 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] as String,
+      // Laravel renvoie un id entier (auto-increment) ; on le convertit
+      // en String pour rester cohérent avec le reste de l'app.
+      id: json['id'].toString(),
       nom: json['nom'] as String? ?? '',
       prenom: json['prenom'] as String? ?? '',
       telephone: json['telephone'] as String? ?? '',
       email: json['email'] as String?,
-      photoUrl: json['photoUrl'] as String?,
-      isVerified: json['isVerified'] as bool? ?? false,
-      //role: _userRoleFromApi(json['role'] as String? ?? 'LOCATAIRE'),
+      photoUrl: json['photoUrl'] as String? ?? json['photo_url'] as String?,
+      isVerified: json['isVerified'] as bool? ??
+          json['is_verified'] as bool? ??
+          json['telephone_verified_at'] != null,
       role: UserRoleX.fromApiValue(json['role'] as String? ?? 'LOCATAIRE'),
     );
   }
 
   /// Utilisateur factice utilisé en mode `AppConstants.useMockAuth`, le
   /// temps que le back-end Node.js ne soit pas encore branché.
-  factory UserModel.demo(UserRole role) {
+  /*factory UserModel.demo(UserRole role) {
     final (nom, prenom) = switch (role) {
       UserRole.locataire => ('Sawadogo', 'Aminata'),
       UserRole.proprietaire => ('Ouédraogo', 'Karim'),
@@ -67,7 +70,7 @@ class UserModel {
     } catch (_) {
       return UserRole.values.first;
     }
-  }
+  }*/
 
   Map<String, dynamic> toJson() => {
         'id': id,

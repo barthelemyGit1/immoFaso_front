@@ -29,6 +29,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
   final _villeQuartierController = TextEditingController();
   final _budgetController = TextEditingController();
   final _piecesController = TextEditingController();
+  final _surfaceController = TextEditingController();
 
   TypeLogement _typeLogement = TypeLogement.villa;
   final Set<Equipement> _equipements = {};
@@ -49,6 +50,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
       _villeQuartierController.text = '${annonce.quartier}, ${annonce.ville}';
       _budgetController.text = annonce.prixMensuel.toStringAsFixed(0);
       _piecesController.text = annonce.nombrePieces.toString();
+      _surfaceController.text = annonce.surface.toString();
       _typeLogement = annonce.typeLogement;
       _equipements.addAll(annonce.equipements);
       _latitude = annonce.latitude;
@@ -120,6 +122,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
           typeLogement: _typeLogement,
           ville: ville,
           quartier: quartier,
+          surface: num.tryParse(_surfaceController.text) ?? 0,
           prixMensuel: num.tryParse(_budgetController.text) ?? 0,
           nombrePieces: int.tryParse(_piecesController.text) ?? 0,
           equipements: _equipements.toList(),
@@ -134,6 +137,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
           typeLogement: _typeLogement,
           ville: ville,
           quartier: quartier,
+          surface: num.tryParse(_surfaceController.text) ?? 0,
           prixMensuel: num.tryParse(_budgetController.text) ?? 0,
           nombrePieces: int.tryParse(_piecesController.text) ?? 0,
           equipements: _equipements.toList(),
@@ -194,6 +198,15 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 controller: _villeQuartierController,
                 icon: Icons.location_on_outlined,
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
+              ),
+              const SizedBox(height: 18),
+              _FieldLabel('Surface'),
+              ProprietaireGoldenField(
+                hint: 'Surface',
+                controller: _surfaceController,
+                icon: Icons.rule_rounded,
+                keyboardType: TextInputType.number,
+                validator: (v) => (v == null || num.tryParse(v) == null) ? 'Surface invalide' : null,
               ),
               const SizedBox(height: 18),
               _FieldLabel('Type de logement'),

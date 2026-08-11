@@ -1,21 +1,23 @@
 /// Statut de modération d'une annonce — cf. workflow de validation admin
 /// du document de conception (entité ANNONCE.statut).
+import 'dart:convert';
+
 enum StatutAnnonce { enAttente, validee, rejetee, louee }
 
 extension StatutAnnonceX on StatutAnnonce {
   String get label => switch (this) {
-        StatutAnnonce.enAttente => 'En attente',
-        StatutAnnonce.validee => 'Validée',
-        StatutAnnonce.rejetee => 'Rejetée',
-        StatutAnnonce.louee => 'Louée',
-      };
+    StatutAnnonce.enAttente => 'En attente',
+    StatutAnnonce.validee => 'Validée',
+    StatutAnnonce.rejetee => 'Rejetée',
+    StatutAnnonce.louee => 'Louée',
+  };
 
   String get apiValue => switch (this) {
-        StatutAnnonce.enAttente => 'EN_ATTENTE',
-        StatutAnnonce.validee => 'VALIDEE',
-        StatutAnnonce.rejetee => 'REJETEE',
-        StatutAnnonce.louee => 'LOUEE',
-      };
+    StatutAnnonce.enAttente => 'EN_ATTENTE',
+    StatutAnnonce.validee => 'VALIDEE',
+    StatutAnnonce.rejetee => 'REJETEE',
+    StatutAnnonce.louee => 'LOUEE',
+  };
 
   static StatutAnnonce fromApiValue(String? value) {
     switch (value?.toUpperCase()) {
@@ -38,39 +40,39 @@ enum TypeLogement { villa, appartement, studio, chambre }
 
 extension TypeLogementX on TypeLogement {
   String get label => switch (this) {
-        TypeLogement.villa => 'Villas',
-        TypeLogement.appartement => 'Appartements',
-        TypeLogement.studio => 'Studio',
-        TypeLogement.chambre => 'Chambres',
-      };
+    TypeLogement.villa => 'Villa',
+    TypeLogement.appartement => 'Appartement',
+    TypeLogement.studio => 'Studio',
+    TypeLogement.chambre => 'Chambre',
+  };
 
-  String get apiValue => name.toUpperCase();
+  String get apiValue => name.toLowerCase(); // 'villa', 'appartement', etc.
 
   static TypeLogement fromApiValue(String value) {
     return TypeLogement.values.firstWhere(
-      (t) => t.apiValue == value.toUpperCase(),
+      (t) => t.apiValue == value.toLowerCase(),
       orElse: () => TypeLogement.villa,
     );
   }
 }
 
 /// Équipements disponibles pour un logement (filtres + badges sur le détail).
-enum Equipement { eau, electricite, internet, climatisation, wifi }
+enum Equipement { eau, electricite, wifi, ventilation, climatisation }
 
 extension EquipementX on Equipement {
   String get label => switch (this) {
-        Equipement.eau => 'Eau',
-        Equipement.electricite => 'Électricité',
-        Equipement.internet => 'Internet',
-        Equipement.climatisation => 'Climatisation',
-        Equipement.wifi => 'Wifi',
-      };
+    Equipement.eau => 'Eau',
+    Equipement.electricite => 'Électricité',
+    Equipement.ventilation => 'Ventilation',
+    Equipement.climatisation => 'Climatisation',
+    Equipement.wifi => 'Wifi',
+  };
 
-  String get apiValue => name.toUpperCase();
+  String get apiValue => name.toLowerCase(); // 'eau', 'wifi', etc.
 
   static Equipement fromApiValue(String value) {
     return Equipement.values.firstWhere(
-      (e) => e.apiValue == value.toUpperCase(),
+      (e) => e.apiValue == value.toLowerCase(),
       orElse: () => Equipement.eau,
     );
   }
@@ -85,10 +87,10 @@ class Photo {
   final int ordre;
 
   factory Photo.fromJson(Map<String, dynamic> json) => Photo(
-        id: json['id'] as String,
-        url: json['url'] as String,
-        ordre: json['ordre'] as int? ?? 0,
-      );
+    id: json['id'] as String,
+    url: json['url'] as String,
+    ordre: json['ordre'] as int? ?? 0,
+  );
 }
 
 /// Entité ANNONCE (version mobile) — cf. dictionnaire de données du
@@ -101,6 +103,7 @@ class Annonce {
     required this.typeLogement,
     required this.ville,
     required this.quartier,
+    required this.surface,
     required this.prixMensuel,
     required this.nombrePieces,
     required this.equipements,
@@ -113,7 +116,6 @@ class Annonce {
     this.isFavori = false,
     this.statut = StatutAnnonce.enAttente,
     this.vues = 0,
- 
   });
 
   final String id;
@@ -124,6 +126,7 @@ class Annonce {
   final String quartier;
   final num prixMensuel;
   final int nombrePieces;
+  final num surface;
   final List<Equipement> equipements;
   final List<Photo> photos;
   final String proprietaireId;
@@ -149,27 +152,76 @@ class Annonce {
   }
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
+    // Parsing sécurisé du champ equipements (gère List, String JSON, ou String séparée par des virgules)
+    List<Equipement> parsedEquipements = [];
+    final rawEquipements = json['equipements'];
+
+    if (rawEquipements is List) {
+      parsedEquipements = rawEquipements
+          .map((e) => EquipementX.fromApiValue(e.toString()))
+          .toList();
+    } else if (rawEquipements is String && rawEquipements.isNotEmpty) {
+      if (rawEquipements.startsWith('[')) {
+        // Cas où le back renvoie une chaîne JSON d'un tableau ex: '["eau","wifi"]'
+        try {
+          final List<dynamic> decoded = jsonDecode(rawEquipements);
+          parsedEquipements = decoded
+              .map((e) => EquipementX.fromApiValue(e.toString()))
+              .toList();
+        } catch (_) {}
+      } else {
+        // Cas où le back renvoie une chaîne séparée par des virgules ex: "eau,wifi"
+        parsedEquipements = rawEquipements
+            .split(',')
+            .map((e) => EquipementX.fromApiValue(e.trim()))
+            .toList();
+      }
+    }
+
+    // Parsing sécurisé du champ photos
+    List<Photo> parsedPhotos = [];
+    final rawPhotos = json['photos'];
+    if (rawPhotos is List) {
+      parsedPhotos = rawPhotos
+          .map(
+            (p) => Photo.fromJson(
+              p is Map<String, dynamic> ? p : {'id': '', 'url': p.toString()},
+            ),
+          )
+          .toList();
+    }
+
     return Annonce(
-      id: json['id'] as String,
+      id: json['id']?.toString() ?? '',
       titre: json['titre'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      typeLogement: TypeLogementX.fromApiValue(json['typeLogement'] as String? ?? 'VILLA'),
+      typeLogement: TypeLogementX.fromApiValue(
+        json['type_logement'] as String? ?? 'villa',
+      ),
       ville: json['ville'] as String? ?? '',
       quartier: json['quartier'] as String? ?? '',
-      prixMensuel: json['prixMensuel'] as num? ?? 0,
-      nombrePieces: json['nombrePieces'] as int? ?? 0,
-      equipements: (json['equipements'] as List<dynamic>? ?? [])
-          .map((e) => EquipementX.fromApiValue(e as String))
-          .toList(),
-      photos: (json['photos'] as List<dynamic>? ?? [])
-          .map((p) => Photo.fromJson(p as Map<String, dynamic>))
-          .toList(),
-      proprietaireId: json['proprietaireId'] as String? ?? '',
-      proprietaireNom: json['proprietaireNom'] as String? ?? '',
+      surface: json['surface'] as num? ?? 0,
+      prixMensuel: json['prix_mois'] as num? ?? 0,
+      nombrePieces:
+          (json['nombre_pieces'] ?? json['nombrePieces']) as int? ??
+          0, // Gère snake_case et camelCase
+      equipements: parsedEquipements,
+      photos: parsedPhotos,
+      proprietaireId:
+          json['proprietaire_id']?.toString() ??
+          json['proprietaireId']?.toString() ??
+          '',
+      proprietaireNom:
+          json['proprietaire_nom'] as String? ??
+          json['proprietaireNom'] as String? ??
+          '',
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
-      proprietaireNote: (json['proprietaireNote'] as num?)?.toDouble(),
-      isFavori: json['isFavori'] as bool? ?? false,
+      proprietaireNote:
+          (json['proprietaire_note'] as num?)?.toDouble() ??
+          (json['proprietaireNote'] as num?)?.toDouble(),
+      isFavori:
+          json['is_favori'] as bool? ?? json['isFavori'] as bool? ?? false,
       statut: StatutAnnonceX.fromApiValue(json['statut'] as String?),
       vues: json['vues'] as int? ?? 0,
     );
@@ -183,6 +235,7 @@ class Annonce {
       typeLogement: typeLogement,
       ville: ville,
       quartier: quartier,
+      surface: surface,
       prixMensuel: prixMensuel,
       nombrePieces: nombrePieces,
       equipements: equipements,
@@ -222,16 +275,20 @@ class RechercheFiltres {
   }) {
     return RechercheFiltres(
       villeOuQuartier: villeOuQuartier ?? this.villeOuQuartier,
-      typeLogement: clearTypeLogement ? null : (typeLogement ?? this.typeLogement),
+      typeLogement: clearTypeLogement
+          ? null
+          : (typeLogement ?? this.typeLogement),
       budgetMax: budgetMax ?? this.budgetMax,
       equipements: equipements ?? this.equipements,
     );
   }
 
   Map<String, dynamic> toQueryParams() => {
-        if (villeOuQuartier != null && villeOuQuartier!.isNotEmpty) 'q': villeOuQuartier,
-        if (typeLogement != null) 'typeLogement': typeLogement!.apiValue,
-        if (budgetMax != null) 'budgetMax': budgetMax,
-        if (equipements.isNotEmpty) 'equipements': equipements.map((e) => e.apiValue).join(','),
-      };
+    if (villeOuQuartier != null && villeOuQuartier!.isNotEmpty)
+      'q': villeOuQuartier,
+    if (typeLogement != null) 'type_logement': typeLogement!.apiValue,
+    if (budgetMax != null) 'prix_mois': budgetMax,
+    if (equipements.isNotEmpty)
+      'equipements': equipements.map((e) => e.apiValue).toList(),
+  };
 }

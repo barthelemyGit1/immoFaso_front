@@ -6,9 +6,7 @@ import '../constants/app_constants.dart';
 /// pour tout ce qui touche à la session utilisateur.
 class SecureStorageService {
   SecureStorageService()
-      : _storage = const FlutterSecureStorage(
-          aOptions: AndroidOptions(encryptedSharedPreferences: true),
-        );
+    : _storage = const FlutterSecureStorage(aOptions: AndroidOptions());
 
   final FlutterSecureStorage _storage;
 
@@ -45,8 +43,7 @@ class SecureStorageService {
   Future<String?> get refreshToken =>
       _storage.read(key: AppConstants.keyRefreshToken);
 
-  Future<String?> get userRole =>
-      _storage.read(key: AppConstants.keyUserRole);
+  Future<String?> get userRole => _storage.read(key: AppConstants.keyUserRole);
 
   Future<String?> get userId => _storage.read(key: AppConstants.keyUserId);
 
