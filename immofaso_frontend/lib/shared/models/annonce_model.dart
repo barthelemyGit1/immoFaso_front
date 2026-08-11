@@ -1,7 +1,7 @@
-/// Statut de modération d'une annonce — cf. workflow de validation admin
-/// du document de conception (entité ANNONCE.statut).
 import 'dart:convert';
 
+/// Statut de modération d'une annonce — cf. workflow de validation admin
+/// du document de conception (entité ANNONCE.statut).
 enum StatutAnnonce { enAttente, validee, rejetee, louee }
 
 extension StatutAnnonceX on StatutAnnonce {
@@ -78,6 +78,22 @@ extension EquipementX on Equipement {
   }
 }
 
+/// --- Helpers de parsing numérique tolérant ---
+/// Laravel renvoie souvent les colonnes `decimal` (prix_mois, surface,
+/// latitude, longitude...) comme des CHAÎNES JSON (ex: "120000") plutôt
+/// que des nombres. Un cast direct `as num?` plante dans ce cas — ces
+/// helpers acceptent num OU String indifféremment.
+num? _tryNum(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value;
+  if (value is String) return num.tryParse(value);
+  return null;
+}
+
+double? _tryDouble(dynamic value) => _tryNum(value)?.toDouble();
+
+int? _tryInt(dynamic value) => _tryNum(value)?.toInt();
+
 /// Entité PHOTO — rattachée à une ANNONCE.
 class Photo {
   const Photo({required this.id, required this.url, this.ordre = 0});
@@ -87,9 +103,9 @@ class Photo {
   final int ordre;
 
   factory Photo.fromJson(Map<String, dynamic> json) => Photo(
-    id: json['id'] as String,
+    id: json['id'].toString(),
     url: json['url'] as String,
-    ordre: json['ordre'] as int? ?? 0,
+    ordre: _tryInt(json['ordre']) ?? 0,
   );
 }
 
@@ -135,9 +151,9 @@ class Annonce {
   final double? longitude;
   final double? proprietaireNote;
   final bool isFavori;
-  // ... et dans les champs :
   final StatutAnnonce statut;
   final int vues;
+
   String get localisation => '$quartier, $ville';
 
   /// Ex: "70 000 F CFA/mois"
@@ -200,30 +216,30 @@ class Annonce {
       ),
       ville: json['ville'] as String? ?? '',
       quartier: json['quartier'] as String? ?? '',
-      surface: json['surface'] as num? ?? 0,
-      prixMensuel: json['prix_mois'] as num? ?? 0,
+      surface: _tryNum(json['surface']) ?? 0,
+      prixMensuel: _tryNum(json['prix_mois']) ?? 0,
       nombrePieces:
-          (json['nombre_pieces'] ?? json['nombrePieces']) as int? ??
-          0, // Gère snake_case et camelCase
+          _tryInt(json['nombre_pieces'] ?? json['nombrePieces']) ?? 0,
       equipements: parsedEquipements,
       photos: parsedPhotos,
       proprietaireId:
           json['proprietaire_id']?.toString() ??
+          json['id_proprietaire']?.toString() ??
           json['proprietaireId']?.toString() ??
           '',
       proprietaireNom:
           json['proprietaire_nom'] as String? ??
           json['proprietaireNom'] as String? ??
           '',
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
+      latitude: _tryDouble(json['latitude']),
+      longitude: _tryDouble(json['longitude']),
       proprietaireNote:
-          (json['proprietaire_note'] as num?)?.toDouble() ??
-          (json['proprietaireNote'] as num?)?.toDouble(),
+          _tryDouble(json['proprietaire_note']) ??
+          _tryDouble(json['proprietaireNote']),
       isFavori:
           json['is_favori'] as bool? ?? json['isFavori'] as bool? ?? false,
       statut: StatutAnnonceX.fromApiValue(json['statut'] as String?),
-      vues: json['vues'] as int? ?? 0,
+      vues: _tryInt(json['vues']) ?? 0,
     );
   }
 
