@@ -150,7 +150,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
       ref.invalidate(dashboardStatsProvider);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(widget.isEdition ? 'Annonce mise à jour.' : 'Annonce publiée, en attente de validation.')),
+        SnackBar(content: Text(widget.isEdition ? 'Annonce mise à jour.' : 'Annonce publiée, en attente de validation.'), backgroundColor: AppColors.success),
       );
       Navigator.of(context).pop();
     } catch (e) {
