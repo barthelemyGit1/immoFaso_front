@@ -17,7 +17,7 @@ class AppLogoBadge extends StatelessWidget {
         color: AppColors.primary.withOpacity(0.08),
         shape: BoxShape.circle,
       ),
-      child: Icon(Icons.home_rounded, color: AppColors.primary, size: size * 0.55),
+      child: Image(image: const AssetImage('assets/icons/icon.png'), width: size * 0.6, height: size * 0.6),
     );
   }
 }

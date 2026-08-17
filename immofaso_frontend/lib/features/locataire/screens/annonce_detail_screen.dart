@@ -14,7 +14,8 @@ class AnnonceDetailScreen extends ConsumerStatefulWidget {
   final String annonceId;
 
   @override
-  ConsumerState<AnnonceDetailScreen> createState() => _AnnonceDetailScreenState();
+  ConsumerState<AnnonceDetailScreen> createState() =>
+      _AnnonceDetailScreenState();
 }
 
 class _AnnonceDetailScreenState extends ConsumerState<AnnonceDetailScreen> {
@@ -28,13 +29,17 @@ class _AnnonceDetailScreenState extends ConsumerState<AnnonceDetailScreen> {
           .demarrerOuRecuperer(annonceId: widget.annonceId);
       if (!mounted) return;
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => ConversationScreen(conversation: conversation)),
+        MaterialPageRoute(
+          builder: (_) => ConversationScreen(conversation: conversation),
+        ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Impossible de contacter le propriétaire pour le moment."),
+          content: Text(
+            "Impossible de contacter le propriétaire pour le moment.",
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -72,6 +77,8 @@ class _AnnonceDetailContent extends ConsumerWidget {
   final bool isContacting;
   final VoidCallback onContacter;
 
+  // String get proprietaireNom => annonce.proprietaireId; // Assuming the property is named proprietaireId
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Stack(
@@ -85,10 +92,14 @@ class _AnnonceDetailContent extends ConsumerWidget {
               foregroundColor: AppColors.textPrimary,
               actions: [
                 IconButton(
-                  icon: Icon(annonce.isFavori ? Icons.favorite : Icons.favorite_border,
-                      color: annonce.isFavori ? AppColors.error : null),
+                  icon: Icon(
+                    annonce.isFavori ? Icons.favorite : Icons.favorite_border,
+                    color: annonce.isFavori ? AppColors.error : null,
+                  ),
                   onPressed: () {
-                    ref.read(annonceRepositoryProvider).toggleFavori(annonce.id, isFavori: !annonce.isFavori);
+                    ref
+                        .read(annonceRepositoryProvider)
+                        .toggleFavori(annonce.id, isFavori: !annonce.isFavori);
                     ref.invalidate(annonceDetailProvider(annonce.id));
                   },
                 ),
@@ -103,19 +114,32 @@ class _AnnonceDetailContent extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(annonce.titre, style: Theme.of(context).textTheme.headlineMedium),
+                    Text(
+                      annonce.titre,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, size: 16, color: AppColors.textSecondary),
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: AppColors.textSecondary,
+                        ),
                         const SizedBox(width: 4),
-                        Text(annonce.localisation, style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          annonce.localisation,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      annonce.prixFormate,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.primary),
+                    Text( annonce.prixFormate,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -127,15 +151,28 @@ class _AnnonceDetailContent extends ConsumerWidget {
                       Wrap(
                         spacing: 16,
                         runSpacing: 8,
-                        children: annonce.equipements.map((e) => _EquipementBadge(equipement: e)).toList(),
+                        children: annonce.equipements
+                            .map((e) => _EquipementBadge(equipements: e))
+                            .toList(),
                       ),
                       const Divider(height: 32, color: AppColors.border),
                     ],
-                    _ProprietaireCard(nom: annonce.proprietaireNom, note: annonce.proprietaireNote),
+                    _ProprietaireCard(
+                      nom: annonce.proprietaireId,
+                      note: annonce.proprietaireNote,
+                    ),
                     const SizedBox(height: 20),
-                    Text('Description', style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      'Description',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 8),
-                    Text(annonce.description, style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.5)),
+                    Text(
+                      annonce.description,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(height: 1.5),
+                    ),
                   ],
                 ),
               ),
@@ -150,11 +187,18 @@ class _AnnonceDetailContent extends ConsumerWidget {
             onPressed: isContacting ? null : onContacter,
             icon: isContacting
                 ? const SizedBox(
-                    height: 18, width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
                 : const Icon(Icons.sms_outlined),
             label: const Text('Contacter le propriétaire'),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFB5372A)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFB5372A),
+            ),
           ),
         ),
       ],
@@ -178,7 +222,13 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
     if (widget.photos.isEmpty) {
       return Container(
         color: AppColors.border,
-        child: const Center(child: Icon(Icons.image_outlined, size: 48, color: AppColors.textSecondary)),
+        child: const Center(
+          child: Icon(
+            Icons.image_outlined,
+            size: 48,
+            color: AppColors.textSecondary,
+          ),
+        ),
       );
     }
     return Stack(
@@ -192,7 +242,10 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => Container(
               color: AppColors.border,
-              child: const Icon(Icons.image_not_supported_outlined, color: AppColors.textSecondary),
+              child: const Icon(
+                Icons.image_not_supported_outlined,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
         ),
@@ -221,16 +274,16 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
 }
 
 class _EquipementBadge extends StatelessWidget {
-  const _EquipementBadge({required this.equipement});
-  final Equipement equipement;
+  const _EquipementBadge({required this.equipements});
+  final Equipement equipements;
 
-  IconData get _icon => switch (equipement) {
-        Equipement.eau => Icons.water_drop_outlined,
-        Equipement.electricite => Icons.bolt_outlined,
-        Equipement.ventilation => Icons.air_outlined,
-        Equipement.climatisation => Icons.ac_unit_outlined,
-        Equipement.wifi => Icons.router_outlined,
-      };
+  IconData get _icon => switch (equipements) {
+    Equipement.eau => Icons.water_drop_outlined,
+    Equipement.electricite => Icons.bolt_outlined,
+    Equipement.ventilation => Icons.air_outlined,
+    Equipement.climatisation => Icons.ac_unit_outlined,
+    Equipement.wifi => Icons.router_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +292,7 @@ class _EquipementBadge extends StatelessWidget {
       children: [
         Icon(_icon, size: 18, color: AppColors.secondary),
         const SizedBox(width: 6),
-        Text(equipement.label, style: Theme.of(context).textTheme.bodyMedium),
+        Text(equipements.label, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }
@@ -270,17 +323,30 @@ class _ProprietaireCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(nom.isNotEmpty ? nom : 'Propriétaire', style: const TextStyle(fontWeight: FontWeight.w700)),
+                Text(
+                  nom.isNotEmpty ? nom : 'Propriétaire',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
                 if (note != null)
                   Row(
                     children: [
-                      const Icon(Icons.star_rounded, size: 14, color: AppColors.warning),
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 14,
+                        color: AppColors.warning,
+                      ),
                       const SizedBox(width: 2),
-                      Text(note!.toStringAsFixed(1), style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        note!.toStringAsFixed(1),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ],
                   )
                 else
-                  Text('Propriétaire', style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    'Propriétaire',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
               ],
             ),
           ),

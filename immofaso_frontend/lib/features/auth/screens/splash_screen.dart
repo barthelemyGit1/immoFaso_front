@@ -15,7 +15,11 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_city, color: Colors.white, size: 56),
+            Image(
+              image: AssetImage('assets/icons/icon2.png'),
+              width: 148,
+              height: 148,
+            ),
             SizedBox(height: 16),
             Text(
               'ImmoFaso',

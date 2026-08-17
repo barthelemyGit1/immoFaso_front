@@ -27,7 +27,8 @@ class MonAnnonceTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(annonce.titre, style: const TextStyle(fontWeight: FontWeight.w700)),
+                Text(annonce.typeLogement.label, style: const TextStyle(fontWeight: FontWeight.w700)),
+                Text(annonce.prixMensuel > 0 ? '${annonce.prixMensuel} FCFA' : 'Pas encore de prix', style: const TextStyle(fontWeight: FontWeight.w600)),
                 Text(annonce.statut.label, style: TextStyle(color: _statutColor, fontSize: 13)),
               ],
             ),

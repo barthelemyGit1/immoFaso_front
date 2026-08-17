@@ -314,7 +314,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isPublishing ? null : _publier,
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 212, 131, 25)),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDFAF2C)),
                   child: _isPublishing
                       ? const SizedBox(
                           height: 20, width: 20,

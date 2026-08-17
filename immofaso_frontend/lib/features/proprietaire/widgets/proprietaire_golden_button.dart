@@ -61,7 +61,7 @@ class ProprietaireGoldenButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFFF0B429),
+      color: const Color(0xFFDFAF2C),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),

@@ -95,6 +95,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Image(image: AssetImage('assets/icons/icon/png'), width: 48, height: 48),
               const Icon(Icons.sms_outlined, color: AppColors.primary, size: 40),
               const SizedBox(height: 20),
               Text('Vérification du numéro', style: Theme.of(context).textTheme.headlineMedium),

@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 class AppColors {
   AppColors._();
 
-  static const Color primary = Color.fromARGB(211, 223, 117, 12); // terracotta
+  static const Color primary = Color(0xFFDFAF2C); // terracotta
   static const Color primaryDark = Color(0xFF8A4A1F);
   static const Color secondary = Color(0xFF1F4B43); // vert profond
   static const Color background = Color(0xFFFAF7F3);
@@ -32,8 +32,8 @@ class AppTheme {
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color.fromARGB(211, 160, 23, 41),
-        primary: const Color.fromARGB(211, 223, 117, 12),
+        seedColor: const Color(0xFFA01729),
+        primary: const Color(0xFFDFAF2C),
         secondary: AppColors.secondary,
         error: AppColors.error,
         surface: AppColors.surface,
@@ -86,7 +86,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color.fromARGB(211, 223, 117, 12), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFFDFAF2C), width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
