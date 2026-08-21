@@ -47,7 +47,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
     if (annonce != null) {
       _titreController.text = annonce.titre;
       _descriptionController.text = annonce.description;
-      _villeQuartierController.text = '${annonce.quartier}, ${annonce.ville}';
+      _villeQuartierController.text = '${annonce.ville}, ${annonce.quartier}';
       _budgetController.text = annonce.prixMensuel.toStringAsFixed(0);
       _piecesController.text = annonce.nombrePieces.toString();
       _surfaceController.text = annonce.surface.toString();
@@ -108,8 +108,8 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
     // "Ville, quartier" est saisi en un seul champ sur la maquette ; on le
     // sépare en `quartier, ville` pour correspondre au modèle de données.
     final parts = _villeQuartierController.text.split(',').map((p) => p.trim()).toList();
-    final quartier = parts.isNotEmpty ? parts.first : _villeQuartierController.text.trim();
-    final ville = parts.length > 1 ? parts.sublist(1).join(', ') : 'Bobo-Dioulasso';
+    final ville = parts.isNotEmpty ? parts.first : _villeQuartierController.text.trim();
+    final quartier = parts.length > 1 ? parts.sublist(1).join(', ') : '';
 
     setState(() => _isPublishing = true);
     try {

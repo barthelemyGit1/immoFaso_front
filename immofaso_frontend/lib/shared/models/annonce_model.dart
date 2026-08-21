@@ -41,7 +41,7 @@ enum TypeLogement { villa, appartement, studio, chambre }
 extension TypeLogementX on TypeLogement {
   String get label => switch (this) {
     TypeLogement.villa => 'Villa',
-    TypeLogement.appartement => 'Appartement',
+    TypeLogement.appartement => 'Logement',
     TypeLogement.studio => 'Studio',
     TypeLogement.chambre => 'Chambre',
   };
@@ -207,6 +207,11 @@ class Annonce {
           .toList();
     }
 
+
+   // La zone géographique (ville/quartier/coordonnées) est imbriquée
+    final rawZone = json['zone'];
+    final zone = rawZone is Map<String, dynamic> ? rawZone : null;
+
     return Annonce(
       id: json['id']?.toString() ?? '',
       titre: json['titre'] as String? ?? '',
@@ -214,12 +219,12 @@ class Annonce {
       typeLogement: TypeLogementX.fromApiValue(
         json['type_logement'] as String? ?? 'villa',
       ),
-      ville: json['ville'] as String? ?? '',
-      quartier: json['quartier'] as String? ?? '',
+      ville: zone?['ville'] as String? ?? json['ville'] as String? ?? '',
+      quartier: zone?['quartier'] as String? ?? json['quartier'] as String? ?? '',
       surface: _tryNum(json['surface']) ?? 0,
       prixMensuel: _tryNum(json['prix_mois']) ?? 0,
       nombrePieces:
-          _tryInt(json['nombre_pieces'] ?? json['nombrePieces']) ?? 0,
+          _tryInt(json['nombrePieces'] ?? json['nombrePieces']) ?? 0,
       equipements: parsedEquipements,
       photos: parsedPhotos,
       proprietaireId:
@@ -231,8 +236,8 @@ class Annonce {
           json['proprietaire_nom'] as String? ??
           json['proprietaireNom'] as String? ??
           '',
-      latitude: _tryDouble(json['latitude']),
-      longitude: _tryDouble(json['longitude']),
+      latitude: _tryDouble(zone?['latitude']) ?? _tryDouble(json['latitude']),
+      longitude: _tryDouble(zone?['longitude']) ?? _tryDouble(json['longitude']),
       proprietaireNote:
           _tryDouble(json['proprietaire_note']) ??
           _tryDouble(json['proprietaireNote']),

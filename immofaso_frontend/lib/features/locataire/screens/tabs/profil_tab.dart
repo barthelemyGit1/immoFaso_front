@@ -26,6 +26,7 @@ class ProfilTab extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(user?.nomComplet ?? '', style: Theme.of(context).textTheme.titleLarge),
           Text(user?.telephone ?? '', style: Theme.of(context).textTheme.bodyMedium),
+          //Text(user?.role ?? '', style: Theme.of(context).textTheme.bobyMedium),
           const SizedBox(height: 24),
           _ProfilTile(icon: Icons.favorite_border, label: 'Mes favoris', onTap: () {}),
           _ProfilTile(icon: Icons.description_outlined, label: 'Mes demandes envoyées', onTap: () {}),
