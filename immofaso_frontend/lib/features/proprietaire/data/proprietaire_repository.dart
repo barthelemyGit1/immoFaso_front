@@ -70,7 +70,7 @@ class ProprietaireRepository {
         MapEntry('quartier', quartier),
         MapEntry('surface', surface.toString()),
         MapEntry('prix_mois', prixMensuel.toString()),
-        MapEntry('nombre_pieces', nombrePieces.toString()),
+        MapEntry('nombrePieces', nombrePieces.toString()),
         if (latitude != null) MapEntry('latitude', latitude.toString()),
         if (longitude != null) MapEntry('longitude', longitude.toString()),
       ]);
@@ -133,7 +133,7 @@ class ProprietaireRepository {
         MapEntry('quartier', quartier),
         MapEntry('surface', surface.toString()),
         MapEntry('prix_mois', prixMensuel.toString()),
-        MapEntry('nombre_pieces', nombrePieces.toString()),
+        MapEntry('nombrePieces', nombrePieces.toString()),
         if (latitude != null) MapEntry('latitude', latitude.toString()),
         if (longitude != null) MapEntry('longitude', longitude.toString()),
       ]);

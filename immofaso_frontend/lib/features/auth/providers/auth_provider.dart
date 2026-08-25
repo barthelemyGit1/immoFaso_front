@@ -77,24 +77,56 @@ class AuthController extends Notifier<AuthState> {
   Future<void> _tryRestoreSession() async {
     state = const AuthLoading();
     final user = await _repository.restoreSession();
-    state = user != null ? AuthAuthenticated(user) : const AuthUnauthenticated();
+    state = user != null
+        ? AuthAuthenticated(user)
+        : const AuthUnauthenticated();
   }
 
-  Future<void> login({required String telephone, required String password}) async {
+  Future<void> login({
+    required String telephone,
+    required String password,
+  }) async {
     state = const AuthLoading();
     try {
-      final result = await _repository.login(telephone: telephone, password: password);
+      final result = await _repository.login(
+        telephone: telephone,
+        password: password,
+      );
       state = AuthAuthenticated(result.user);
     } on Exception catch (e) {
       state = AuthError(e.toString());
     }
   }
 
-  Future<void> verifyOtp({required String telephone, required String otpCode}) async {
+  Future<void> verifyOtp({
+    required String telephone,
+    required String otpCode,
+  }) async {
     state = const AuthLoading();
     try {
-      final result = await _repository.verifyOtp(telephone: telephone, otpCode: otpCode);
+      final result = await _repository.verifyOtp(
+        telephone: telephone,
+        otpCode: otpCode,
+      );
       state = AuthAuthenticated(result.user);
+    } on Exception catch (e) {
+      state = AuthError(e.toString());
+    }
+  }
+
+  Future<void> changePassword({
+    required String telephone,
+    required String otpCode,
+    required String newPassword,
+  }) async {
+    state = const AuthLoading();
+    try {
+      await _repository.changerPassword(
+        telephone: telephone,
+        otpCode: otpCode,
+        newPassword: newPassword,
+      );
+      state = const AuthUnauthenticated();
     } on Exception catch (e) {
       state = AuthError(e.toString());
     }

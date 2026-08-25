@@ -24,7 +24,7 @@ class MesAnnoncesTab extends ConsumerWidget {
         children: [
           BrandHeader(
             trailing: IconButton(
-              icon: const Icon(Icons.add_circle, color: Color.fromARGB(255, 212, 131, 25)),
+              icon: const Icon(Icons.add_circle, color: Color(0xFFDFAF2C)),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PublierAnnonceScreen()),
               ),

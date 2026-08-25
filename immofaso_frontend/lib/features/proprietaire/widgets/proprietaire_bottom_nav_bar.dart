@@ -23,8 +23,14 @@ class ProprietaireBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 212, 131, 25),
-        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, -2))],
+        color: Color(0xFFDFAF2C),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 8,
+            offset: Offset(0, -2),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -40,10 +46,29 @@ class ProprietaireBottomNavBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Icon(
-                    item.icon,
-                    color: isActive ? const Color.fromARGB(255, 78, 25, 212) : Colors.white,
-                    size: 26,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        item.icon,
+                        color: isActive
+                            ? const Color(0xFF4E19D4)
+                            : Colors.white,
+                        size: 28,
+                      ),
+                      Text(
+                        item.label,
+                        style: TextStyle(
+                          color: isActive
+                              ? const Color(0xFF4E19D4)
+                              : Colors.white,
+                          fontSize: 6,
+                          fontWeight: isActive
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );

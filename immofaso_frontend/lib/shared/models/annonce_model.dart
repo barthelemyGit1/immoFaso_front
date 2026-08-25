@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../../core/constants/app_constants.dart';
 
 /// Statut de modération d'une annonce — cf. workflow de validation admin
 /// du document de conception (entité ANNONCE.statut).
@@ -41,7 +42,7 @@ enum TypeLogement { villa, appartement, studio, chambre }
 extension TypeLogementX on TypeLogement {
   String get label => switch (this) {
     TypeLogement.villa => 'Villa',
-    TypeLogement.appartement => 'Appartement',
+    TypeLogement.appartement => 'Logement',
     TypeLogement.studio => 'Studio',
     TypeLogement.chambre => 'Chambre',
   };
@@ -104,9 +105,26 @@ class Photo {
 
   factory Photo.fromJson(Map<String, dynamic> json) => Photo(
     id: json['id'].toString(),
-    url: json['url'] as String,
+    url: _resolveUrl(json['url'] as String),
     ordre: _tryInt(json['ordre']) ?? 0,
   );
+
+  /// Laravel génère l'URL des photos à partir d'APP_URL (souvent
+  /// http://localhost:8000 en dev), inatteignable depuis l'émulateur
+  /// Android. On force le host vers celui utilisé par l'ApiClient.
+  static String _resolveUrl(String rawUrl) {
+    //const apiHost = '10.0.2.2:8000'; // doit correspondre à l'host de ApiClient
+    final uri = Uri.tryParse(rawUrl);
+    if (uri == null) return rawUrl;
+    final apiUri = Uri.parse(AppConstants.socketUrl);
+    return uri
+        .replace(
+          scheme: apiUri.scheme,
+          host: apiUri.host,
+          port: apiUri.hasPort ? apiUri.port : null,
+        )
+        .toString();
+  }
 }
 
 /// Entité ANNONCE (version mobile) — cf. dictionnaire de données du
@@ -207,6 +225,18 @@ class Annonce {
           .toList();
     }
 
+    // La zone géographique (ville/quartier/coordonnées) est imbriquée
+    final rawZone = json['zone'];
+    final zone = rawZone is Map<String, dynamic> ? rawZone : null;
+
+    final rawProprietaire = json['proprietaire'];
+    final proprietaire = rawProprietaire is Map<String, dynamic>
+        ? rawProprietaire
+        : null;
+    final proprietaireNomComplet = proprietaire != null
+        ? '${proprietaire['prenom'] ?? ''} ${proprietaire['nom'] ?? ''}'.trim()
+        : '';
+
     return Annonce(
       id: json['id']?.toString() ?? '',
       titre: json['titre'] as String? ?? '',
@@ -214,12 +244,12 @@ class Annonce {
       typeLogement: TypeLogementX.fromApiValue(
         json['type_logement'] as String? ?? 'villa',
       ),
-      ville: json['ville'] as String? ?? '',
-      quartier: json['quartier'] as String? ?? '',
+      ville: zone?['ville'] as String? ?? json['ville'] as String? ?? '',
+      quartier:
+          zone?['quartier'] as String? ?? json['quartier'] as String? ?? '',
       surface: _tryNum(json['surface']) ?? 0,
       prixMensuel: _tryNum(json['prix_mois']) ?? 0,
-      nombrePieces:
-          _tryInt(json['nombre_pieces'] ?? json['nombrePieces']) ?? 0,
+      nombrePieces: _tryInt(json['nombrePieces'] ?? json['nombrePieces']) ?? 0,
       equipements: parsedEquipements,
       photos: parsedPhotos,
       proprietaireId:
@@ -227,12 +257,15 @@ class Annonce {
           json['id_proprietaire']?.toString() ??
           json['proprietaireId']?.toString() ??
           '',
-      proprietaireNom:
-          json['proprietaire_nom'] as String? ??
-          json['proprietaireNom'] as String? ??
-          '',
-      latitude: _tryDouble(json['latitude']),
-      longitude: _tryDouble(json['longitude']),
+      proprietaireNom: proprietaireNomComplet.isNotEmpty
+          ? proprietaireNomComplet
+          : (json['proprietaire_nom'] as String? ??
+                json['proprietaireNom'] as String? ??
+                ''),
+
+      latitude: _tryDouble(zone?['latitude']) ?? _tryDouble(json['latitude']),
+      longitude:
+          _tryDouble(zone?['longitude']) ?? _tryDouble(json['longitude']),
       proprietaireNote:
           _tryDouble(json['proprietaire_note']) ??
           _tryDouble(json['proprietaireNote']),

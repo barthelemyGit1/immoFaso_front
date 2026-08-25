@@ -28,7 +28,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    ref.read(authControllerProvider.notifier).login(
+    ref
+        .read(authControllerProvider.notifier)
+        .login(
           telephone: _telephoneController.text.trim(),
           password: _passwordController.text,
         );
@@ -42,7 +44,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
       if (next is AuthError) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.message), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(next.message),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     });
@@ -56,10 +61,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.location_city, color: AppColors.primary, size: 40),
+                const Image(
+                  image: AssetImage('assets/icons/icon2.png'),
+                  width: 128,
+                  height: 128,
+                ),
                 const SizedBox(height: 24),
-                Text('Content de vous revoir',
-                    style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  'Content de vous revoir',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 6),
                 Text(
                   'Connectez-vous pour accéder à votre compte ImmoFaso.',
@@ -91,10 +102,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                       size: 20,
                     ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -117,7 +131,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Text('Se connecter'),
                 ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../core/constants/app_constants.dart';
@@ -14,9 +14,9 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
-}
+}*/
 
-class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+/*class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _telephoneFormKey = GlobalKey<FormState>();
   final _resetFormKey = GlobalKey<FormState>();
 
@@ -203,4 +203,4 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       ),
     );
   }
-}
+}*/
