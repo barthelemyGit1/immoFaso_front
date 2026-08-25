@@ -1,22 +1,23 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/network/api_exceptions.dart';
 import '../../../core/theme/app_theme.dart';
-import '../providers/auth_provider.dart';
-import '../widgets/auth_text_field.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../auth/widgets/auth_text_field.dart';
 
 enum _Step { telephone, otpAndNewPassword }
 
-class ForgotPasswordScreen extends ConsumerStatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class ChangePasswordScreen extends ConsumerStatefulWidget {
+  const ChangePasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
-}*/
+  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
 
-/*class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   final _telephoneFormKey = GlobalKey<FormState>();
   final _resetFormKey = GlobalKey<FormState>();
 
@@ -26,6 +27,7 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 
   _Step _step = _Step.telephone;
   bool _isSubmitting = false;
+  String? _devOtpCode;
 
   @override
   void dispose() {
@@ -39,11 +41,14 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
     if (!_telephoneFormKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
     try {
-      await ref.read(authRepositoryProvider).forgotPassword(
+      final otpCode = await ref.read(authRepositoryProvider).forgotPassword(
             telephone: _telephoneController.text.trim(),
           );
       if (!mounted) return;
-      setState(() => _step = _Step.otpAndNewPassword);
+      setState(() {
+        _devOtpCode = otpCode;
+        _step = _Step.otpAndNewPassword;
+      });
     } on ApiException catch (e) {
       _showError(e.message);
     } finally {
@@ -55,7 +60,7 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
     if (!_resetFormKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
     try {
-      await ref.read(authRepositoryProvider).resetPassword(
+      await ref.read(authRepositoryProvider).changerPassword(
             telephone: _telephoneController.text.trim(),
             otpCode: _pinController.text,
             newPassword: _newPasswordController.text,
@@ -77,6 +82,15 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: AppColors.error),
+    );
+  }
+
+  void _copyOtp() {
+    final code = _devOtpCode;
+    if (code == null) return;
+    Clipboard.setData(ClipboardData(text: code));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Code copié.')),
     );
   }
 
@@ -160,6 +174,10 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
             'Entrez le code reçu par SMS et choisissez un nouveau mot de passe.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
+          if (_devOtpCode != null) ...[
+            const SizedBox(height: 16),
+            _OtpDebugBanner(otpCode: _devOtpCode!, onCopy: _copyOtp),
+          ],
           const SizedBox(height: 24),
           // MaterialPinFormField combine le rendu Material de MaterialPinField
           // avec l'intégration à un Form parent (validator/autovalidate).
@@ -203,4 +221,47 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
       ),
     );
   }
-}*/
+}
+
+class _OtpDebugBanner extends StatelessWidget {
+  const _OtpDebugBanner({required this.otpCode, required this.onCopy});
+  final String otpCode;
+  final VoidCallback onCopy;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onCopy,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.info_outline, size: 18, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  text: 'Code de test : ',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  children: [
+                    TextSpan(
+                      text: otpCode,
+                      style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Icon(Icons.copy_outlined, size: 18, color: AppColors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+}

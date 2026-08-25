@@ -33,7 +33,7 @@ class ConversationRepository {
   Future<Conversation> demarrerOuRecuperer({required String annonceId}) async {
     try {
       final response = await _api.raw.post('/annonces/$annonceId/conversations', data: {'annonceId': annonceId});
-      return Conversation.fromJson(response.data as Map<String, dynamic>);
+      return Conversation.fromJson(response.data['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
@@ -55,7 +55,7 @@ class ConversationRepository {
         '/conversations/$conversationId/messages',
         data: {'contenu': contenu},
       );
-      return Message.fromJson(response.data as Map<String, dynamic>);
+      return Message.fromJson(response.data['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }

@@ -29,12 +29,12 @@ class AnnonceRepository {
   }
 
   Future<Annonce> getDetail(String annonceId) async {
-    try {
-      final response = await _api.raw.get('/annonces/$annonceId');
-      return Annonce.fromJson(response.data as Map<String, dynamic>);
-    } on DioException catch (e) {
-      throw ApiClient.mapError(e);
-    }
+   try {
+    final response = await _api.raw.get('/annonces/$annonceId');
+    return Annonce.fromJson(response.data['data'] as Map<String, dynamic>);
+  } on DioException catch (e) {
+    throw ApiClient.mapError(e);
+  }
   }
 
   /// Annonces avec coordonnées GPS, pour l'affichage sur la carte
@@ -45,7 +45,7 @@ class AnnonceRepository {
     double rayonKm = 10,
   }) async {
     try {
-      final response = await _api.raw.get('/annonces/proches', queryParameters: {
+      final response = await _api.raw.get('#', queryParameters: {
         'lat': latitude,
         'lng': longitude,
         'rayon': rayonKm,

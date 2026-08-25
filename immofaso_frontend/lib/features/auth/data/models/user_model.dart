@@ -41,37 +41,7 @@ class UserModel {
       role: UserRoleX.fromApiValue(json['role'] as String? ?? 'LOCATAIRE'),
     );
   }
-
-  /// Utilisateur factice utilisé en mode `AppConstants.useMockAuth`, le
-  /// temps que le back-end Node.js ne soit pas encore branché.
-  /*factory UserModel.demo(UserRole role) {
-    final (nom, prenom) = switch (role) {
-      UserRole.locataire => ('Sawadogo', 'Aminata'),
-      UserRole.proprietaire => ('Ouédraogo', 'Karim'),
-      UserRole.admin => ('Traoré', 'Fatou'),
-    };
-    return UserModel(
-      id: 'demo-${role.apiValue.toLowerCase()}',
-      nom: nom,
-      prenom: prenom,
-      telephone: '70 00 00 00',
-      role: role,
-      isVerified: true,
-    );
-  }
-
-  // Parse API role value into UserRole. Falls back to first enum value if unknown.
-  static UserRole _userRoleFromApi(String? value) {
-    final v = (value ?? '').toUpperCase();
-    try {
-      return UserRole.values.firstWhere((e) =>
-          e.toString().split('.').last.toUpperCase() == v,
-      );
-    } catch (_) {
-      return UserRole.values.first;
-    }
-  }*/
-
+  
   Map<String, dynamic> toJson() => {
         'id': id,
         'nom': nom,

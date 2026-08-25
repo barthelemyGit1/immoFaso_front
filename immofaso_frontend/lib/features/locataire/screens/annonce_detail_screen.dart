@@ -158,7 +158,7 @@ class _AnnonceDetailContent extends ConsumerWidget {
                       const Divider(height: 32, color: AppColors.border),
                     ],
                     _ProprietaireCard(
-                      nom: annonce.proprietaireId,
+                      nom: annonce.proprietaireNom,
                       note: annonce.proprietaireNote,
                     ),
                     const SizedBox(height: 20),

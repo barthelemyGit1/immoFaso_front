@@ -32,6 +32,14 @@ class AppRoutes {
   static const adminHome = '/admin';
 }
 
+/// Arguments passés à l'écran de vérification OTP via `extra`.
+/// [otpCode] n'est renseigné qu'en environnement de dev (back local).
+class OtpVerificationArgs {
+  const OtpVerificationArgs({required this.telephone, this.otpCode});
+  final String telephone;
+  final String? otpCode;
+}
+
 /// Provider du router. Ré-évalue les redirections à chaque changement
 /// de [AuthState] et [OnboardingState] grâce à `refreshListenable`.
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -93,14 +101,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.otpVerification,
         builder: (context, state) {
-          final telephone = state.extra as String? ?? '';
-          return OtpVerificationScreen(telephone: telephone);
+          final args = state.extra as OtpVerificationArgs?;
+          return OtpVerificationScreen(
+            telephone: args?.telephone ?? '',
+            initialOtpCode: args?.otpCode,
+          );
         },
       ),
-      GoRoute(
+      /*GoRoute(
         path: AppRoutes.forgotPassword,
         builder: (_, __) => const ForgotPasswordScreen(),
-      ),
+      ),*/
 
       // Placeholders — à remplacer par les vraies branches de navigation
       // (ShellRoute avec bottom nav) une fois les écrans métier construits.

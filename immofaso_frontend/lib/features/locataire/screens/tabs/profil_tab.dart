@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../../../shared/widgets/brand_header.dart';
+import '../demandes_envoyees_screen.dart';
+import '../notifications_screen.dart';
+import '../parametres_screen.dart';
+import '../favoris_screen.dart';
 
 class ProfilTab extends ConsumerWidget {
   const ProfilTab({super.key});
@@ -28,10 +32,27 @@ class ProfilTab extends ConsumerWidget {
           Text(user?.telephone ?? '', style: Theme.of(context).textTheme.bodyMedium),
           //Text(user?.role ?? '', style: Theme.of(context).textTheme.bobyMedium),
           const SizedBox(height: 24),
-          _ProfilTile(icon: Icons.favorite_border, label: 'Mes favoris', onTap: () {}),
-          _ProfilTile(icon: Icons.description_outlined, label: 'Mes demandes envoyées', onTap: () {}),
-          _ProfilTile(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {}),
-          _ProfilTile(icon: Icons.settings_outlined, label: 'Paramètres', onTap: () {}),
+          _ProfilTile(icon: Icons.favorite_border, label: 'Mes favoris', onTap: () {
+              Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const FavorisScreen()),
+              );
+            },
+          ),
+          _ProfilTile(icon: Icons.description_outlined, label: 'Mes demandes envoyées', onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const DemandesEnvoyeesScreen()),
+              );
+            },),
+          _ProfilTile(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+            },),
+          _ProfilTile(icon: Icons.settings_outlined, label: 'Paramètres', onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ParametresScreen()),
+              );
+            },),
           const Spacer(),
           Padding(
             padding: const EdgeInsets.all(20),

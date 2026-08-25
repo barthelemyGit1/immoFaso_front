@@ -45,7 +45,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      await ref.read(authRepositoryProvider).register(
+      final otpCode = await ref.read(authRepositoryProvider).register(
             nom: _nomController.text.trim(),
             prenom: _prenomController.text.trim(),
             telephone: _telephoneController.text.trim(),
@@ -56,7 +56,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (!mounted) return;
       // Le back-end envoie l'OTP par SMS dès la création du compte
       // (cf. diagramme de séquence "Inscription OTP").
-      context.push(AppRoutes.otpVerification, extra: _telephoneController.text.trim());
+      context.push(
+        AppRoutes.otpVerification,
+        extra: OtpVerificationArgs(
+          telephone: _telephoneController.text.trim(),
+          otpCode: otpCode,
+        ),
+    );
+
     } on ApiException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

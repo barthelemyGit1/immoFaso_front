@@ -33,7 +33,7 @@ class AuthRepository {
   /// Étape 1 de l'inscription : création du compte (non vérifié) + envoi OTP.
   /// Le rôle choisi ici détermine le parcours (locataire ou propriétaire) ;
   /// le rôle admin n'est jamais créé via cet écran public.
-  Future<void> register({
+  Future<String?> register({
     required String nom,
     required String prenom,
     required String telephone,
@@ -42,15 +42,16 @@ class AuthRepository {
     String? email,
   }) async {
     try {
-      await _api.raw.post('/register', data: {
+      final response = await _api.raw.post('/register', data: {
         'nom': nom,
         'prenom': prenom,
         'telephone': telephone,
         'password': password,
         'password_confirmation': password,
         'role': role.apiValue,
-        if (email != null && email.isNotEmpty) 'email': email,
+        'email': email,
       });
+      return _extractOtpCode(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
@@ -75,12 +76,21 @@ class AuthRepository {
     }
   }
 
-  Future<void> resendOtp({required String telephone}) async {
+  Future<String?> resendOtp({required String telephone}) async {
     try {
-      await _api.raw.post('/resend-otp', data: {'telephone': telephone});
+      final response = await _api.raw.post('/resend-otp', data: {'telephone': telephone});
+      return _extractOtpCode(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
+  }
+
+  /// Le champ `otp.password` n'est présent que si le back tourne en
+  /// environnement local (cf. UtilisateurController::store / ResendOtpController).
+  String? _extractOtpCode(Map<String, dynamic> responseBody) {
+    final data = responseBody['data'] as Map<String, dynamic>?;
+    final otp = data?['otp'] as Map<String, dynamic>?;
+    return otp?['password'] as String?;
   }
 
   /// Connexion par téléphone + mot de passe.
@@ -102,34 +112,17 @@ class AuthRepository {
     }
   }
 
-  /// MODE MOCK : simule une connexion réussie en tant que locataire, sans
-  /// aucun appel réseau. Permet de continuer à construire les écrans
-  /// (dashboard locataire, etc.) avant que le back-end soit disponible.
-  /// ⚠️ À retirer quand `AppConstants.useMockAuth` repasse à `false`.
-  /*Future<AuthResult> _mockLogin({required String telephone}) async {
-    await Future.delayed(const Duration(milliseconds: 400)); // simule la latence réseau
-    //final user = UserModel.demo(UserRole.locataire);
 
-    await _storage.saveSession(
-      accessToken: 'mock-access-token',
-      refreshToken: 'mock-refresh-token',
-      userId: user.id,
-      role: user.role.apiValue,
-    );
-    await _storage.saveCachedUserJson(user.toJson());
-
-    return AuthResult(user: user, accessToken: 'mock-access-token', refreshToken: 'mock-refresh-token');
-  }*/
-
-  Future<void> forgotPassword({required String telephone}) async {
+  Future<String?> forgotPassword({required String telephone}) async {
     try {
-      await _api.raw.post('/password-reset', data: {'telephone': telephone});
+      final response = await _api.raw.post('/password-reset', data: {'telephone': telephone});
+      return _extractOtpCode(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
   }
 
-  Future<void> resetPassword({
+  Future<void> changerPassword({
     required String telephone,
     required String otpCode,
     required String newPassword,
@@ -138,7 +131,8 @@ class AuthRepository {
       await _api.raw.post('/password-reset/confirm', data: {
         'telephone': telephone,
         'otp': otpCode,
-        'newPassword': newPassword,
+        'password': newPassword,
+        'password_confirmation': newPassword,
       });
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
