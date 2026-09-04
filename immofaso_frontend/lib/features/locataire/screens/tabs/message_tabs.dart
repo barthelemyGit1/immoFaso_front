@@ -27,10 +27,12 @@ class MessagesTab extends ConsumerWidget {
               isEmpty: (list) => list.isEmpty,
               emptyIcon: Icons.chat_bubble_outline_rounded,
               emptyTitle: 'Aucune conversation',
-              emptyMessage: 'Contactez un propriétaire depuis une annonce pour démarrer une discussion.',
+              emptyMessage:
+                  'Contactez un propriétaire depuis une annonce pour démarrer une discussion.',
               data: (context, list) => ListView.separated(
                 itemCount: list.length,
-                separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.border),
+                separatorBuilder: (_, __) =>
+                    const Divider(height: 1, color: AppColors.border),
                 itemBuilder: (context, index) {
                   final conversation = list[index];
                   return ListTile(
@@ -38,7 +40,10 @@ class MessagesTab extends ConsumerWidget {
                       backgroundColor: AppColors.background,
                       child: Icon(Icons.person, color: AppColors.textSecondary),
                     ),
-                    title: Text(conversation.interlocuteurNom, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    title: Text(
+                      conversation.interlocuteurNom,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     subtitle: Text(
                       conversation.dernierMessage ?? conversation.annonceTitre,
                       maxLines: 1,
@@ -48,11 +53,10 @@ class MessagesTab extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        if (conversation.dernierMessageLe != null)
-                          Text(
-                            DateFormat('HH:mm').format(conversation.dernierMessageLe!),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
+                        Text(
+                          '${conversation.dernierMessageLe}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                         if (conversation.nonLus > 0) ...[
                           const SizedBox(height: 4),
                           CircleAvatar(
@@ -60,14 +64,20 @@ class MessagesTab extends ConsumerWidget {
                             backgroundColor: AppColors.primary,
                             child: Text(
                               '${conversation.nonLus}',
-                              style: const TextStyle(fontSize: 10, color: Colors.white),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],
                       ],
                     ),
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => ConversationScreen(conversation: conversation)),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ConversationScreen(conversation: conversation),
+                      ),
                     ),
                   );
                 },

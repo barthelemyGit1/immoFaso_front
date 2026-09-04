@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 /// Entité MESSAGE — cf. dictionnaire de données.
 class Message {
   const Message({
@@ -17,13 +19,13 @@ class Message {
   final bool lu;
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-        id: json['id'] as String,
-        conversationId: json['conversationId'] as String,
-        expediteurId: json['expediteurId'] as String,
-        contenu: json['contenu'] as String? ?? '',
-        envoyeLe: DateTime.parse(json['envoyeLe'] as String),
-        lu: json['lu'] as bool? ?? false,
-      );
+    id: json['id'] as String,
+    conversationId: json['id_conversation'] as String,
+    expediteurId: json['id_expediteur'] as String,
+    contenu: json['contenu'] as String? ?? '',
+    envoyeLe: DateTime.parse(json['date_envoi'] as String),
+    lu: json['lu'] as bool? ?? false,
+  );
 }
 
 /// Entité CONVERSATION — rattachée à une ANNONCE, entre un locataire et
@@ -36,7 +38,7 @@ class Conversation {
     required this.interlocuteurId,
     required this.interlocuteurNom,
     this.dernierMessage,
-    this.dernierMessageLe,
+    this.dernierMessageLe = false,
     this.nonLus = 0,
   });
 
@@ -46,19 +48,17 @@ class Conversation {
   final String interlocuteurId;
   final String interlocuteurNom;
   final String? dernierMessage;
-  final DateTime? dernierMessageLe;
+  final bool dernierMessageLe;
   final int nonLus;
 
   factory Conversation.fromJson(Map<String, dynamic> json) => Conversation(
-        id: json['id'] as String,
-        annonceId: json['annonceId'] as String,
-        annonceTitre: json['annonceTitre'] as String? ?? '',
-        interlocuteurId: json['interlocuteurId'] as String,
-        interlocuteurNom: json['interlocuteurNom'] as String? ?? '',
-        dernierMessage: json['dernierMessage'] as String?,
-        dernierMessageLe: json['dernierMessageLe'] != null
-            ? DateTime.parse(json['dernierMessageLe'] as String)
-            : null,
-        nonLus: json['nonLus'] as int? ?? 0,
-      );
+    id: json['id'] as String,
+    annonceId: json['annonceId'] as String,
+    annonceTitre: json['annonceTitre'] as String? ?? '',
+    interlocuteurId: json['interlocuteurId'] as String,
+    interlocuteurNom: json['interlocuteurNom'] as String? ?? '',
+    dernierMessage: json['dernierMessage'] as String?,
+    dernierMessageLe: json['dernierMessageLu'] as bool? ?? false,
+    nonLus: json['nonLus'] as int? ?? 0,
+  );
 }

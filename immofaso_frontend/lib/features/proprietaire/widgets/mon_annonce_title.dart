@@ -33,7 +33,9 @@ class MonAnnonceTile extends StatelessWidget {
               ],
             ),
           ),
-          TextButton(onPressed: onModifier, child: const Text('Modifier')),
+          if (annonce.statut != StatutAnnonce.louee && annonce.statut != StatutAnnonce.validee)
+            TextButton(onPressed: onModifier, child: const Text('Modifier')),
+          
         ],
       ),
     );
