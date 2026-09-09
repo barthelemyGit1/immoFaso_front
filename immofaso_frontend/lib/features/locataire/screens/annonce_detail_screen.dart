@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:immofaso_frontend/core/constants/app_constants.dart';
+import 'package:immofaso_frontend/features/auth/providers/auth_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/annonce_model.dart';
 import '../../../shared/widgets/async_value_view.dart';
 import '../../messagerie/providers/conversation_providers.dart';
 import '../../messagerie/screens/conversation_screen.dart';
-import '../providers/annonce_providers.dart';
+import '../providers/annonce_providers.dart';// ou le chemin exact où UserRole est défini
 
 /// Écran "Details" de la maquette.
 class AnnonceDetailScreen extends ConsumerStatefulWidget {
@@ -81,6 +83,14 @@ class _AnnonceDetailContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    //Recuperation du role
+    final user = switch (ref.watch(authControllerProvider)) {
+      AuthAuthenticated(:final user) => user,
+      _ => null,
+    };
+    // Vérification du rôle (adaptez selon le nom de la propriété dans votre modèle User, ex: user.isLocataire ou user.role == 'locataire')
+    final isLocataire = user != null && user.role == UserRole.locataire && user.id != annonce.proprietaireId;
+
     return Stack(
       children: [
         CustomScrollView(
@@ -179,28 +189,29 @@ class _AnnonceDetailContent extends ConsumerWidget {
             ),
           ],
         ),
-        Positioned(
-          left: 20,
-          right: 20,
-          bottom: 20,
-          child: ElevatedButton.icon(
-            onPressed: isContacting ? null : onContacter,
-            icon: isContacting
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Icon(Icons.sms_outlined),
-            label: const Text('Contacter le propriétaire'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFB5372A),
+        if (isLocataire)
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            child: ElevatedButton.icon(
+              onPressed: isContacting ? null : onContacter,
+              icon: isContacting
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.sms_outlined),
+              label: const Text('Contacter le propriétaire'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFB5372A),
+              ),
             ),
           ),
-        ),
       ],
     );
   }

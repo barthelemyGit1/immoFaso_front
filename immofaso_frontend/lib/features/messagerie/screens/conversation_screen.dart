@@ -97,7 +97,6 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               emptyTitle: 'Aucun message',
               emptyMessage: 'Démarrez la conversation en envoyant un message.',
               data: (context, msgs) => ListView.builder(
-                reverse: true,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 itemCount: msgs.length,
                 itemBuilder: (context, index) {
@@ -128,12 +127,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                   const SizedBox(width: 8),
                   IconButton.filled(
                     onPressed: _isSending ? null : _envoyer,
-                    icon: _isSending
-                        ? const SizedBox(
+                    icon: _isSending ? const SizedBox( 
+                            
                             height: 16, width: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.send_rounded),
-                    style: IconButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.send_rounded),
+                            style: IconButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
                   ),
                 ],
               ),

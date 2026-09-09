@@ -5,7 +5,7 @@ import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/otp_verification_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
-import '../../features/auth/screens/forgot_password_screen.dart';
+import '../../features/locataire/screens/change_password_screen.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/onboarding/providers/onboarding_provider.dart';
 import '../../features/onboarding/screens/onboarding_screen.dart';
@@ -23,7 +23,7 @@ class AppRoutes {
   static const login = '/login';
   static const register = '/register';
   static const otpVerification = '/verify-otp';
-  static const forgotPassword = '/password-reset';
+  static const changePassword = '/password-reset/confirm';
 
   // Racines par rôle — chaque feature branchera ses sous-routes ici
   // (ex: /locataire/home, /locataire/annonce/:id, ...).
@@ -65,7 +65,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         AppRoutes.login,
         AppRoutes.register,
         AppRoutes.otpVerification,
-        AppRoutes.forgotPassword,
+        AppRoutes.changePassword,
       ].contains(state.matchedLocation);
 
       // L'onboarding est déjà vu : si l'utilisateur y revient (bouton
@@ -108,10 +108,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      /*GoRoute(
-        path: AppRoutes.forgotPassword,
-        builder: (_, __) => const ForgotPasswordScreen(),
-      ),*/
+      GoRoute(
+        path: AppRoutes.changePassword,
+        builder: (_, __) => const ChangePasswordScreen(),
+      ),
 
       // Placeholders — à remplacer par les vraies branches de navigation
       // (ShellRoute avec bottom nav) une fois les écrans métier construits.

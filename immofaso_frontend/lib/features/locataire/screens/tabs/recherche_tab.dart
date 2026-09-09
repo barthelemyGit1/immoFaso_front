@@ -55,10 +55,10 @@ class _RechercheTabState extends ConsumerState<RechercheTab> {
                 children: [
                   Text('Filtres', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 20)),
                   const SizedBox(height: 16),
-                  Text('Ville, quartier', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  Text('Ville ou quartier', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   GoldenSearchField(
-                    hint: 'Ville, quartier',
+                    hint: 'Entrez une ville ou un quartier',
                     controller: _villeController,
                     onChanged: filtresNotifier.setVilleOuQuartier,
                   ),

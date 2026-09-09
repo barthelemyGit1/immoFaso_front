@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -5,19 +6,56 @@ import '../../../../shared/models/annonce_model.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../providers/annonce_providers.dart';
-import '../../../../shared/widgets/annonce_card.dart';  
+import '../../../../shared/widgets/annonce_card.dart';
 import '../../../../shared/widgets/brand_header.dart';
 import '../../widgets/golden_search_field.dart';
 import '../annonce_detail_screen.dart';
-import '../resultats_recherche_screen.dart';
 
 /// Écran "SearchPage" de la maquette : salutation, recherche rapide,
 /// catégories, liste des annonces récentes.
-class AccueilTab extends ConsumerWidget {
+class AccueilTab extends ConsumerStatefulWidget {
   const AccueilTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AccueilTab> createState() => _AccueilTabState();
+}
+
+class _AccueilTabState extends ConsumerState<AccueilTab> {
+  final _searchController = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String texte) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      final valeur = texte.trim();
+      final notifier = ref.read(filtresControllerProvider.notifier);
+
+      if (valeur.isEmpty) {
+        notifier.setVilleOuQuartier(null);
+        notifier.setBudgetMax(null);
+        return;
+      }
+
+      final montant = num.tryParse(valeur);
+      if (montant != null) {
+        notifier.setBudgetMax(montant);
+        notifier.setVilleOuQuartier(null);
+      } else {
+        notifier.setVilleOuQuartier(valeur);
+        notifier.setBudgetMax(null);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final prenom = authState is AuthAuthenticated ? authState.user.prenom : '';
     final resultats = ref.watch(resultatsRechercheProvider);
@@ -40,10 +78,8 @@ class AccueilTab extends ConsumerWidget {
                 const SizedBox(height: 16),
                 GoldenSearchField(
                   hint: 'Ville, quartier, montant...',
-                  readOnly: true,
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ResultatsRechercheScreen()),
-                  ),
+                  controller: _searchController,
+                  onChanged: _onSearchChanged,
                 ),
                 const SizedBox(height: 14),
                 _CategoriesRow(),
@@ -93,10 +129,28 @@ class _CategoriesRow extends ConsumerWidget {
       height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: TypeLogement.values.length,
+        itemCount: TypeLogement.values.length + 1,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final type = TypeLogement.values[index];
+          if (index == 0) {
+            final isSelected = filtres.typeLogement == null;
+            return ChoiceChip(
+              label: const Text('Tout'),
+              selected: isSelected,
+              onSelected: (_) {
+                ref.read(filtresControllerProvider.notifier).setTypeLogement(null);
+              },
+              selectedColor: AppColors.primary,
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+              backgroundColor: AppColors.surface,
+              side: const BorderSide(color: AppColors.border),
+            );
+          }
+
+          final type = TypeLogement.values[index - 1];
           final isSelected = filtres.typeLogement == type;
           return ChoiceChip(
             label: Text(type.label),

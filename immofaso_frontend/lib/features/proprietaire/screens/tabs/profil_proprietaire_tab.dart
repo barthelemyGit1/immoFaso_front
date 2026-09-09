@@ -4,6 +4,9 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/brand_header.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../providers/proprietaire_providers.dart';
+import '../demandes_recues_screen.dart';
+import '../notifications_screen.dart';
+import '../parametres_screen.dart';
 
 class ProfilProprietaireTab extends ConsumerWidget {
   const ProfilProprietaireTab({super.key});
@@ -42,10 +45,21 @@ class ProfilProprietaireTab extends ConsumerWidget {
             error: (_, __) => const SizedBox.shrink(),
           ),
           const SizedBox(height: 24),
-          _ProfilTile(icon: Icons.home_work_outlined, label: 'Mes annonces', onTap: () {}),
-          _ProfilTile(icon: Icons.description_outlined, label: 'Demandes reçues', onTap: () {}),
-          _ProfilTile(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {}),
-          _ProfilTile(icon: Icons.settings_outlined, label: 'Paramètres', onTap: () {}),
+          _ProfilTile(icon: Icons.description_outlined, label: 'Demandes reçues', onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const DemandesRecuesScreen()),
+              );
+            },),
+          _ProfilTile(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+            },),
+          _ProfilTile(icon: Icons.settings_outlined, label: 'Paramètres', onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ParametresScreen()),
+              );
+            },),
           const Spacer(),
           Padding(
             padding: const EdgeInsets.all(20),

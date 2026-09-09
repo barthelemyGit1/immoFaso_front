@@ -320,14 +320,18 @@ class RechercheFiltres {
     TypeLogement? typeLogement,
     num? budgetMax,
     List<Equipement>? equipements,
+    bool clearVilleOuQuartier = false,
     bool clearTypeLogement = false,
+    bool clearBudgetMax = false,
   }) {
     return RechercheFiltres(
-      villeOuQuartier: villeOuQuartier ?? this.villeOuQuartier,
+      villeOuQuartier: clearVilleOuQuartier
+          ? null
+          : (villeOuQuartier ?? this.villeOuQuartier),
       typeLogement: clearTypeLogement
           ? null
           : (typeLogement ?? this.typeLogement),
-      budgetMax: budgetMax ?? this.budgetMax,
+      budgetMax: clearBudgetMax ? null : (budgetMax ?? this.budgetMax),
       equipements: equipements ?? this.equipements,
     );
   }
@@ -336,7 +340,7 @@ class RechercheFiltres {
     if (villeOuQuartier != null && villeOuQuartier!.isNotEmpty)
       'q': villeOuQuartier,
     if (typeLogement != null) 'type_logement': typeLogement!.apiValue,
-    if (budgetMax != null) 'prix_mois': budgetMax,
+    if (budgetMax != null) 'prix_max': budgetMax,
     if (equipements.isNotEmpty)
       'equipements': equipements.map((e) => e.apiValue).toList(),
   };

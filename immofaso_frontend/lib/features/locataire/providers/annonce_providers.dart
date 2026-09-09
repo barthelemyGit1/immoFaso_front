@@ -15,7 +15,9 @@ class FiltresController extends Notifier<RechercheFiltres> {
   RechercheFiltres build() => const RechercheFiltres();
 
   void setVilleOuQuartier(String? value) {
-    state = state.copyWith(villeOuQuartier: value);
+    state = (value == null || value.isEmpty)
+        ? state.copyWith(clearVilleOuQuartier: true)
+        : state.copyWith(villeOuQuartier: value);
   }
 
   void setTypeLogement(TypeLogement? value) {
@@ -25,7 +27,9 @@ class FiltresController extends Notifier<RechercheFiltres> {
   }
 
   void setBudgetMax(num? value) {
-    state = state.copyWith(budgetMax: value);
+    state = value == null
+        ? state.copyWith(clearBudgetMax: true)
+        : state.copyWith(budgetMax: value);
   }
 
   void toggleEquipement(Equipement equipement) {

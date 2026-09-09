@@ -41,10 +41,29 @@ class LocataireBottomNavBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Icon(
-                    item.icon,
-                    color: isActive ? const Color.fromARGB(255, 77, 34, 218) : Colors.white,
-                    size: 26,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        item.icon,
+                        color: isActive
+                            ? const Color(0xFF4E19D4)
+                            : Colors.white,
+                        size: 28,
+                      ),
+                      Text(
+                        item.label,
+                        style: TextStyle(
+                          color: isActive
+                              ? const Color(0xFF4E19D4)
+                              : Colors.white,
+                          fontSize: 6,
+                          fontWeight: isActive
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );

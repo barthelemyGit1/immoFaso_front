@@ -82,6 +82,7 @@ class AccueilProprietaireTab extends ConsumerWidget {
                           .take(3)
                           .map((annonce) => MonAnnonceTile(
                                 annonce: annonce,
+                                
                                 onModifier: () => Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (_) => PublierAnnonceScreen(annonceExistante: annonce),
