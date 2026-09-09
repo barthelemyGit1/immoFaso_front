@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:immofaso_frontend/core/constants/app_constants.dart';
 import 'package:immofaso_frontend/features/auth/providers/auth_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/annonce_model.dart';
 import '../../../shared/widgets/async_value_view.dart';
 import '../../messagerie/providers/conversation_providers.dart';
 import '../../messagerie/screens/conversation_screen.dart';
-import '../providers/annonce_providers.dart';
+import '../providers/annonce_providers.dart';// ou le chemin exact où UserRole est défini
 
 /// Écran "Details" de la maquette.
 class AnnonceDetailScreen extends ConsumerStatefulWidget {
@@ -88,7 +89,7 @@ class _AnnonceDetailContent extends ConsumerWidget {
       _ => null,
     };
     // Vérification du rôle (adaptez selon le nom de la propriété dans votre modèle User, ex: user.isLocataire ou user.role == 'locataire')
-    final isLocataire = user != null && user.role == 'LOCATAIRE';
+    final isLocataire = user != null && user.role == UserRole.locataire && user.id != annonce.proprietaireId;
 
     return Stack(
       children: [
