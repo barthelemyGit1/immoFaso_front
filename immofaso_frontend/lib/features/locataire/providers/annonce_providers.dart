@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_client.dart';
 import '../../../shared/models/annonce_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../data/annonce_repository.dart';
+import 'package:geolocator/geolocator.dart'; 
+import 'package:latlong2/latlong.dart';
 
 final annonceRepositoryProvider = Provider<AnnonceRepository>((ref) {
   return AnnonceRepository(apiClient: ref.watch(apiClientProvider));
@@ -67,10 +68,39 @@ final annonceDetailProvider =
 
 /// Annonces avec coordonnées GPS, pour la carte (rayon autour de
 /// Bobo-Dioulasso par défaut tant qu'on n'a pas la position réelle).
-final annoncesCarteProvider = FutureProvider.autoDispose<List<Annonce>>((ref) async {
-  final repository = ref.watch(annonceRepositoryProvider);
-  return repository.rechercherProches(latitude: 11.1771, longitude: -4.2979);
+/// Position du locataire. null si la localisation est refusée ou désactivée.
+final positionLocataireProvider = FutureProvider<LatLng?>((ref) async {
+  if (!await Geolocator.isLocationServiceEnabled()) return null;
+
+  var permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+  }
+  if (permission == LocationPermission.denied ||
+      permission == LocationPermission.deniedForever) {
+    return null;
+  }
+
+  try {
+    final p = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 15),
+      ),
+    );
+    return LatLng(p.latitude, p.longitude);
+  } catch (_) {
+    return null;
+  }
 });
+
+/// Annonces autour d'un point (lat, lng).
+final annoncesNearbyProvider =
+    FutureProvider.family<List<Annonce>, ({double lat, double lng})>(
+  (ref, pos) => ref
+      .watch(annonceRepositoryProvider)
+      .annoncesNearby(lat: pos.lat, lng: pos.lng),
+);
 
 final favorisProvider = FutureProvider.autoDispose<List<Annonce>>((ref) async {
   final repository = ref.watch(annonceRepositoryProvider);

@@ -7,13 +7,23 @@ import '../../../shared/models/annonce_model.dart';
 import '../../../shared/widgets/async_value_view.dart';
 import '../../messagerie/providers/conversation_providers.dart';
 import '../../messagerie/screens/conversation_screen.dart';
-import '../providers/annonce_providers.dart';// ou le chemin exact où UserRole est défini
+import '../providers/annonce_providers.dart';
+import 'annonce_map_screen.dart';
 
 /// Écran "Details" de la maquette.
 class AnnonceDetailScreen extends ConsumerStatefulWidget {
-  const AnnonceDetailScreen({super.key, required this.annonceId});
+  const AnnonceDetailScreen({
+    super.key,
+    required this.annonceId,
+    this.initialIsFavori,
+  });
 
   final String annonceId;
+
+  /// État du favori connu par l'écran appelant (ex. la carte).
+  /// Prioritaire sur la valeur renvoyée par le détail tant que
+  /// l'utilisateur n'a pas modifié le favori ici.
+  final bool? initialIsFavori;
 
   @override
   ConsumerState<AnnonceDetailScreen> createState() =>
@@ -22,6 +32,30 @@ class AnnonceDetailScreen extends ConsumerStatefulWidget {
 
 class _AnnonceDetailScreenState extends ConsumerState<AnnonceDetailScreen> {
   bool _isContacting = false;
+
+  late bool? _favoriOverride = widget.initialIsFavori;
+
+
+  Future<void> _toggleFavori(Annonce annonce) async {
+    final ancienEtat = _favoriOverride ?? annonce.isFavori;
+    final nouvelEtat = !ancienEtat;
+
+    setState(() => _favoriOverride = nouvelEtat); // cœur mis à jour immédiatement
+    try {
+      await ref
+          .read(annonceRepositoryProvider)
+          .toggleFavori(annonce.id, isFavori: nouvelEtat);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _favoriOverride = ancienEtat); // on annule en cas d'erreur
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Impossible de modifier les favoris pour le moment."),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
 
   Future<void> _contacterProprietaire() async {
     setState(() => _isContacting = true);
@@ -54,14 +88,25 @@ class _AnnonceDetailScreenState extends ConsumerState<AnnonceDetailScreen> {
   Widget build(BuildContext context) {
     final detail = ref.watch(annonceDetailProvider(widget.annonceId));
 
-    return Scaffold(
-      body: AsyncValueView<Annonce>(
-        value: detail,
-        onRetry: () => ref.invalidate(annonceDetailProvider(widget.annonceId)),
-        data: (context, annonce) => _AnnonceDetailContent(
-          annonce: annonce,
-          isContacting: _isContacting,
-          onContacter: _contacterProprietaire,
+    // Au retour (bouton retour de l'AppBar, du téléphone ou geste), on renvoie
+    // l'état du favori à la carte.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) Navigator.of(context).pop(_favoriOverride);
+      },
+      child: Scaffold(
+        body: AsyncValueView<Annonce>(
+          value: detail,
+          onRetry: () =>
+              ref.invalidate(annonceDetailProvider(widget.annonceId)),
+          data: (context, annonce) => _AnnonceDetailContent(
+            annonce: annonce,
+            isFavori: _favoriOverride ?? annonce.isFavori,
+            onToggleFavori: () => _toggleFavori(annonce),
+            isContacting: _isContacting,
+            onContacter: _contacterProprietaire,
+          ),
         ),
       ),
     );
@@ -71,25 +116,28 @@ class _AnnonceDetailScreenState extends ConsumerState<AnnonceDetailScreen> {
 class _AnnonceDetailContent extends ConsumerWidget {
   const _AnnonceDetailContent({
     required this.annonce,
+    required this.isFavori,
+    required this.onToggleFavori,
     required this.isContacting,
     required this.onContacter,
   });
 
   final Annonce annonce;
+  final bool isFavori;
+  final VoidCallback onToggleFavori;
   final bool isContacting;
   final VoidCallback onContacter;
 
-  // String get proprietaireNom => annonce.proprietaireId; // Assuming the property is named proprietaireId
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //Recuperation du role
+    // Récupération du rôle
     final user = switch (ref.watch(authControllerProvider)) {
       AuthAuthenticated(:final user) => user,
       _ => null,
     };
-    // Vérification du rôle (adaptez selon le nom de la propriété dans votre modèle User, ex: user.isLocataire ou user.role == 'locataire')
-    final isLocataire = user != null && user.role == UserRole.locataire && user.id != annonce.proprietaireId;
+    final isLocataire = user != null &&
+        user.role == UserRole.locataire &&
+        user.id != annonce.proprietaireId;
 
     return Stack(
       children: [
@@ -103,15 +151,10 @@ class _AnnonceDetailContent extends ConsumerWidget {
               actions: [
                 IconButton(
                   icon: Icon(
-                    annonce.isFavori ? Icons.favorite : Icons.favorite_border,
-                    color: annonce.isFavori ? AppColors.error : null,
+                    isFavori ? Icons.favorite : Icons.favorite_border,
+                    color: isFavori ? Colors.red : null,
                   ),
-                  onPressed: () {
-                    ref
-                        .read(annonceRepositoryProvider)
-                        .toggleFavori(annonce.id, isFavori: !annonce.isFavori);
-                    ref.invalidate(annonceDetailProvider(annonce.id));
-                  },
+                  onPressed: onToggleFavori,
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
@@ -144,7 +187,8 @@ class _AnnonceDetailContent extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Text( annonce.prixFormate,
+                    Text(
+                      annonce.prixFormate,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -166,6 +210,26 @@ class _AnnonceDetailContent extends ConsumerWidget {
                             .toList(),
                       ),
                       const Divider(height: 32, color: AppColors.border),
+                    ],
+                    //Button pour voir l'annonce sur la carte si les coordonnées sont disponibles
+                    if (annonce.latitude != null && annonce.longitude != null) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => AnnonceMapScreen(
+                                titre: annonce.titre,
+                                latitude: annonce.latitude!,
+                                longitude: annonce.longitude!,
+                              ),
+                            ),
+                          ),
+                          icon: const Icon(Icons.map_outlined),
+                          label: const Text('Voir sur la carte'),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                     ],
                     _ProprietaireCard(
                       nom: annonce.proprietaireNom,

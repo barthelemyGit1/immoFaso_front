@@ -57,10 +57,12 @@ class MesAnnoncesTab extends ConsumerWidget {
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final annonce = list[index];
-                  return AnnonceCard(
-                    annonce: annonce,
+                  return GestureDetector(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => AnnonceDetailScreen(annonceId: annonce.id)),
+                    ),
+                    child: AnnonceCard(
+                      annonce: annonce,
                     ),
                   );
                 },

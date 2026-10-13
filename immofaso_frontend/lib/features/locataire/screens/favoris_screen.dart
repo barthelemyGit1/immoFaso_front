@@ -29,8 +29,7 @@ class FavorisScreen extends ConsumerWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final annonce = items[index];
-              return AnnonceCard(
-                annonce: annonce,
+              return InkWell(
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -38,12 +37,15 @@ class FavorisScreen extends ConsumerWidget {
                     ),
                   );
                 },
-                onToggleFavori: (isFavori) {
-                  ref
-                      .read(annonceRepositoryProvider)
-                      .toggleFavori(annonce.id, isFavori: isFavori);
-                  ref.invalidate(favorisProvider);
-                },
+                child: AnnonceCard(
+                  annonce: annonce,
+                  onToggleFavori: (isFavori) {
+                    ref
+                        .read(annonceRepositoryProvider)
+                        .toggleFavori(annonce.id, isFavori: isFavori);
+                    ref.invalidate(favorisProvider);
+                  },
+                ),
               );
             },
           );

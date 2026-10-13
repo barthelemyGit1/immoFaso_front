@@ -72,9 +72,16 @@ class _AccueilTabState extends ConsumerState<AccueilTab> {
               children: [
                 Text(
                   'Bonjour${prenom.isNotEmpty ? ', $prenom' : ''}',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 22),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineMedium?.copyWith(fontSize: 22),
                 ),
-                Text('Où cherchez-vous ?', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 22)),
+                Text(
+                  'Où cherchez-vous ?',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineMedium?.copyWith(fontSize: 22),
+                ),
                 const SizedBox(height: 16),
                 GoldenSearchField(
                   hint: 'Ville, quartier, montant...',
@@ -94,22 +101,30 @@ class _AccueilTabState extends ConsumerState<AccueilTab> {
               isEmpty: (list) => list.isEmpty,
               emptyIcon: Icons.home_work_outlined,
               emptyTitle: 'Aucune annonce disponible',
-              emptyMessage: 'Les nouvelles annonces publiées par les propriétaires apparaîtront ici.',
+              emptyMessage:
+                  'Les nouvelles annonces publiées par les propriétaires apparaîtront ici.',
               data: (context, annonces) => ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                 itemCount: annonces.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final annonce = annonces[index];
-                  return AnnonceCard(
-                    annonce: annonce,
+                  return GestureDetector(
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => AnnonceDetailScreen(annonceId: annonce.id)),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AnnonceDetailScreen(annonceId: annonce.id),
+                      ),
                     ),
-                    onToggleFavori: (isFavori) {
-                      ref.read(annonceRepositoryProvider).toggleFavori(annonce.id, isFavori: isFavori);
-                      ref.invalidate(resultatsRechercheProvider);
-                    },
+                    child: AnnonceCard(
+                      annonce: annonce,
+                      onToggleFavori: (isFavori) {
+                        ref
+                            .read(annonceRepositoryProvider)
+                            .toggleFavori(annonce.id, isFavori: isFavori);
+                        ref.invalidate(resultatsRechercheProvider);
+                      },
+                    ),
                   );
                 },
               ),
@@ -138,7 +153,9 @@ class _CategoriesRow extends ConsumerWidget {
               label: const Text('Tout'),
               selected: isSelected,
               onSelected: (_) {
-                ref.read(filtresControllerProvider.notifier).setTypeLogement(null);
+                ref
+                    .read(filtresControllerProvider.notifier)
+                    .setTypeLogement(null);
               },
               selectedColor: AppColors.primary,
               labelStyle: TextStyle(
@@ -156,7 +173,9 @@ class _CategoriesRow extends ConsumerWidget {
             label: Text(type.label),
             selected: isSelected,
             onSelected: (_) {
-              ref.read(filtresControllerProvider.notifier).setTypeLogement(isSelected ? null : type);
+              ref
+                  .read(filtresControllerProvider.notifier)
+                  .setTypeLogement(isSelected ? null : type);
             },
             selectedColor: AppColors.primary,
             labelStyle: TextStyle(
