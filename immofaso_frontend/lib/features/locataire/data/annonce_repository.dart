@@ -39,13 +39,13 @@ class AnnonceRepository {
 
   /// Annonces avec coordonnées GPS, pour l'affichage sur la carte
   /// (recherche géospatiale PostGIS côté back).
-  Future<List<Annonce>> rechercherProches({
+  /*Future<List<Annonce>> annoncesNearby({
     required double latitude,
     required double longitude,
     double rayonKm = 10,
   }) async {
     try {
-      final response = await _api.raw.get('#', queryParameters: {
+      final response = await _api.raw.get('/annonces/nearby', queryParameters: {
         'lat': latitude,
         'lng': longitude,
         'rayon': rayonKm,
@@ -55,14 +55,29 @@ class AnnonceRepository {
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
+  }*/
+
+  Future<List<Annonce>> annoncesNearby({
+    required double lat,
+    required double lng,
+    double rayonKm = 5,
+  }) async {
+    final response = await _api.raw.get(
+      '/annonces/nearby',
+      queryParameters: {'lat': lat, 'lng': lng, 'rayon': rayonKm},
+    );
+    final list = response.data['data'] as List;
+    return list
+        .map((e) => Annonce.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> toggleFavori(String annonceId, {required bool isFavori}) async {
     try {
       if (isFavori) {
-        await _api.raw.post('/favoris/$annonceId');
+        await _api.raw.post('/annonces/$annonceId/favoris', data: {'is_favori': isFavori});
       } else {
-        await _api.raw.delete('/favoris/$annonceId');
+        await _api.raw.post('/annonces/$annonceId/favoris',  data: {'is_favori': isFavori});
       }
     } on DioException catch (e) {
       throw ApiClient.mapError(e);

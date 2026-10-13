@@ -19,7 +19,7 @@ class PublierAnnonceScreen extends ConsumerStatefulWidget {
   bool get isEdition => annonceExistante != null;
 
   @override
-  ConsumerState<PublierAnnonceScreen> createState() => _PublierAnnonceScreenState();
+  ConsumerState createState() => _PublierAnnonceScreenState();
 }
 
 class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
@@ -30,10 +30,12 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
   final _budgetController = TextEditingController();
   final _piecesController = TextEditingController();
   final _surfaceController = TextEditingController();
+  final TextEditingController _latitudeController = TextEditingController();
+  final TextEditingController _longitudeController = TextEditingController();
 
   TypeLogement _typeLogement = TypeLogement.villa;
   final Set<Equipement> _equipements = {};
-  final List<File> _nouvellesPhotos = [];
+  final List<File> _nouvellesPhotos = <File>[];
 
   double? _latitude;
   double? _longitude;
@@ -47,7 +49,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
     if (annonce != null) {
       _titreController.text = annonce.titre;
       _descriptionController.text = annonce.description;
-      _villeQuartierController.text = '${annonce.ville}, ${annonce.quartier}';
+      _villeQuartierController.text = '\({annonce.ville},\){annonce.quartier}';
       _budgetController.text = annonce.prixMensuel.toStringAsFixed(0);
       _piecesController.text = annonce.nombrePieces.toString();
       _surfaceController.text = annonce.surface.toString();
@@ -55,6 +57,13 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
       _equipements.addAll(annonce.equipements);
       _latitude = annonce.latitude;
       _longitude = annonce.longitude;
+
+      if (_latitude != null) {
+        _latitudeController.text = _latitude.toString();
+      }
+      if (_longitude != null) {
+        _longitudeController.text = _longitude.toString();
+      }
     }
   }
 
@@ -65,10 +74,13 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
     _villeQuartierController.dispose();
     _budgetController.dispose();
     _piecesController.dispose();
+    _surfaceController.dispose();
+    _latitudeController.dispose();
+    _longitudeController.dispose();
     super.dispose();
   }
 
-  Future<void> _obtenirGeolocalisation() async {
+  Future _obtenirGeolocalisation() async {
     setState(() => _isLocalisationEnCours = true);
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
@@ -85,6 +97,8 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
       setState(() {
         _latitude = position.latitude;
         _longitude = position.longitude;
+        _latitudeController.text = position.latitude.toString();
+        _longitudeController.text = position.longitude.toString();
       });
     } catch (e) {
       if (!mounted) return;
@@ -96,17 +110,38 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
     }
   }
 
-  Future<void> _choisirImages() async {
+  Future _choisirImages() async {
     final images = await ImagePicker().pickMultiImage(imageQuality: 85);
     if (images.isEmpty) return;
     setState(() => _nouvellesPhotos.addAll(images.map((x) => File(x.path))));
   }
 
-  Future<void> _publier() async {
+  Future _publier() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // "Ville, quartier" est saisi en un seul champ sur la maquette ; on le
-    // sépare en `quartier, ville` pour correspondre au modèle de données.
+    // Validation des coordonnées GPS
+    if (_latitude == null || _longitude == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Veuillez renseigner la géolocalisation (latitude et longitude)."),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    // Validation des photos (au moins une photo requise)
+    final aDesAnciennesPhotos = widget.isEdition && (widget.annonceExistante?.photos.isNotEmpty ?? false);
+    if (_nouvellesPhotos.isEmpty && !aDesAnciennesPhotos) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Veuillez ajouter au moins une photo pour l'annonce."),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     final parts = _villeQuartierController.text.split(',').map((p) => p.trim()).toList();
     final ville = parts.isNotEmpty ? parts.first : _villeQuartierController.text.trim();
     final quartier = parts.length > 1 ? parts.sublist(1).join(', ') : '';
@@ -150,7 +185,10 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
       ref.invalidate(dashboardStatsProvider);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(widget.isEdition ? 'Annonce mise à jour.' : 'Annonce publiée, en attente de validation.'), backgroundColor: AppColors.success),
+        SnackBar(
+          content: Text(widget.isEdition ? 'Annonce mise à jour.' : 'Annonce publiée, en attente de validation.'),
+          backgroundColor: AppColors.success,
+        ),
       );
       Navigator.of(context).pop();
     } catch (e) {
@@ -193,19 +231,23 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
               ),
               const SizedBox(height: 18),
               _FieldLabel('Ville, quartier'),
-              ProprietaireGoldenField(
-                hint: 'Ville, quartier',
+              TextFormField(
                 controller: _villeQuartierController,
-                icon: Icons.location_on_outlined,
+                decoration: const InputDecoration(
+                  hintText: 'Ville, quartier',
+                  prefixIcon: Icon(Icons.location_on_outlined),
+                ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
               ),
               const SizedBox(height: 18),
               _FieldLabel('Surface'),
-              ProprietaireGoldenField(
-                hint: 'Surface',
+              TextFormField(
                 controller: _surfaceController,
-                icon: Icons.rule_rounded,
                 keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Surface',
+                  prefixIcon: Icon(Icons.rule_rounded),
+                ),
                 validator: (v) => (v == null || num.tryParse(v) == null) ? 'Surface invalide' : null,
               ),
               const SizedBox(height: 18),
@@ -239,11 +281,13 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
               ),
               const SizedBox(height: 18),
               _FieldLabel('Budget mensuel'),
-              ProprietaireGoldenField(
-                hint: 'Budget mensuel',
+              TextFormField(
                 controller: _budgetController,
-                icon: Icons.search,
                 keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Budget mensuel',
+                  prefixIcon: Icon(Icons.search),
+                ),
                 validator: (v) => (v == null || num.tryParse(v) == null) ? 'Montant invalide' : null,
               ),
               const SizedBox(height: 18),
@@ -261,10 +305,18 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 );
               }),
               const SizedBox(height: 12),
+              _FieldLabel('Coordonnées GPS *'),
+              _CoordonneesGpsFields(
+                latitudeController: _latitudeController,
+                longitudeController: _longitudeController,
+                onLatitudeChanged: (val) => setState(() => _latitude = val),
+                onLongitudeChanged: (val) => setState(() => _longitude = val),
+              ),
+              const SizedBox(height: 12),
               ProprietaireGoldenButton(
-                icon: Icons.location_on,
-                label: _latitude != null
-                    ? 'Position obtenue (${_latitude!.toStringAsFixed(4)}, ${_longitude!.toStringAsFixed(4)})'
+                icon: Icons.my_location,
+                label: _latitude != null && _longitude != null
+                    ? 'Réactualiser la position GPS'
                     : 'Obtenir la géolocalisation',
                 isLoading: _isLocalisationEnCours,
                 onTap: _obtenirGeolocalisation,
@@ -272,7 +324,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
               const SizedBox(height: 12),
               ProprietaireGoldenButton(
                 icon: Icons.image_outlined,
-                label: 'Upload les images',
+                label: 'Upload les images *',
                 onTap: _choisirImages,
               ),
               if (_nouvellesPhotos.isNotEmpty) ...[
@@ -317,8 +369,10 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDFAF2C)),
                   child: _isPublishing
                       ? const SizedBox(
-                          height: 20, width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
                       : Text(widget.isEdition ? 'Enregistrer' : 'Publier'),
                 ),
               ),
@@ -339,6 +393,55 @@ class _FieldLabel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+class _CoordonneesGpsFields extends StatelessWidget {
+  const _CoordonneesGpsFields({
+    required this.latitudeController,
+    required this.longitudeController,
+    required this.onLatitudeChanged,
+    required this.onLongitudeChanged,
+  });
+
+  final TextEditingController latitudeController;
+  final TextEditingController longitudeController;
+  final ValueChanged onLatitudeChanged;
+  final ValueChanged onLongitudeChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: latitudeController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+            decoration: const InputDecoration(
+              labelText: 'Latitude',
+              hintText: 'Ex: 12.3714',
+              prefixIcon: Icon(Icons.map_outlined),
+            ),
+            validator: (v) => (v == null || double.tryParse(v) == null) ? 'Requis' : null,
+            onChanged: (v) => onLatitudeChanged(double.tryParse(v)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: TextFormField(
+            controller: longitudeController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+            decoration: const InputDecoration(
+              labelText: 'Longitude',
+              hintText: 'Ex: -1.5197',
+              prefixIcon: Icon(Icons.map_outlined),
+            ),
+            validator: (v) => (v == null || double.tryParse(v) == null) ? 'Requis' : null,
+            onChanged: (v) => onLongitudeChanged(double.tryParse(v)),
+          ),
+        ),
+      ],
     );
   }
 }

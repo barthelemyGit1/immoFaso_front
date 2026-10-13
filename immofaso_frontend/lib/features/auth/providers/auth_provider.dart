@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/secure_storage_service.dart';
 import '../data/models/user_model.dart';
 import '../data/repositories/auth_repository.dart';
+import 'package:dio/dio.dart';
 
 /// --- Injection de dépendances de base ---
 
@@ -74,6 +74,20 @@ class AuthController extends Notifier<AuthState> {
     return const AuthInitial();
   }
 
+  /// Transforme une exception en message français lisible.
+  String message(Object e, {String message401 = 'Identifiants incorrects.'}) {
+    if (e is DioException) {
+      final status = e.response?.statusCode;
+      if (status == 401 || status == 422) return message401;
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        return 'Impossible de joindre le serveur. Vérifiez votre connexion.';
+      }
+    }
+    return 'Une erreur est survenue. Réessayez plus tard.';
+  }
+
   Future<void> _tryRestoreSession() async {
     state = const AuthLoading();
     final user = await _repository.restoreSession();
@@ -83,20 +97,20 @@ class AuthController extends Notifier<AuthState> {
   }
 
   Future<void> login({
-    required String telephone,
-    required String password,
-  }) async {
-    state = const AuthLoading();
-    try {
-      final result = await _repository.login(
-        telephone: telephone,
-        password: password,
-      );
-      state = AuthAuthenticated(result.user);
-    } on Exception catch (e) {
-      state = AuthError(e.toString());
-    }
+  required String telephone,
+  required String password,
+}) async {
+  state = const AuthLoading();
+  try {
+    final result = await _repository.login(
+      telephone: telephone,
+      password: password,
+    );
+    state = AuthAuthenticated(result.user);
+  } catch (e) {
+    state = AuthError(e.toString().replaceFirst('Exception: ', ''));
   }
+}
 
   Future<void> verifyOtp({
     required String telephone,

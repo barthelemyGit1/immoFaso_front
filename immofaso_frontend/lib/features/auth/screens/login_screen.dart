@@ -27,6 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _submit() {
+    FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
     ref
         .read(authControllerProvider.notifier)
@@ -40,15 +41,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState is AuthLoading;
+    final errorMessage = authState is AuthError ? authState.message : null;
 
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
       if (next is AuthError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.message),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(next.message),
+              backgroundColor: AppColors.error,
+            ),
+          );
       }
     });
 
@@ -76,7 +80,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   'Connectez-vous pour accéder à votre compte ImmoFaso.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+
+                // Message d'erreur affiché dans le formulaire
+                if (errorMessage != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.error.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: AppColors.error,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            errorMessage,
+                            style: const TextStyle(
+                              color: AppColors.error,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 AuthTextField(
                   label: 'Numéro de téléphone',
                   hint: '70 00 00 00',
