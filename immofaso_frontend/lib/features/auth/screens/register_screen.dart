@@ -103,7 +103,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     Expanded(
                       child: AuthTextField(
-                        label: 'Prénom',
+                        label: 'Prénom *',
                         controller: _prenomController,
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
                       ),
@@ -111,7 +111,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: AuthTextField(
-                        label: 'Nom',
+                        label: 'Nom *',
                         controller: _nomController,
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
                       ),
@@ -120,8 +120,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 18),
                 AuthTextField(
-                  label: 'Numéro de téléphone',
-                  hint: '70 00 00 00',
+                  label: 'Numéro de téléphone *',
+                  hint: '70 09 70 00',
                   controller: _telephoneController,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icons.phone_outlined,
@@ -149,7 +149,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 18),
                 AuthTextField(
-                  label: 'Mot de passe',
+                  label: 'Mot de passe *',
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outline,
@@ -169,7 +169,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 18),
                 AuthTextField(
-                  label: 'Confirmer le mot de passe',
+                  label: 'Confirmer le mot de passe *',
                   controller: _confirmPasswordController,
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outline,

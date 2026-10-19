@@ -12,12 +12,12 @@ class AppConstants {
   // Idéalement injecté via --dart-define plutôt qu'en dur ici.
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000/api/v1',
+    defaultValue: 'https://starless-dander-enjoyer.ngrok-free.dev/api/v1',
   );
 
   static const String socketUrl = String.fromEnvironment(
     'SOCKET_URL',
-    defaultValue: 'http://10.0.2.2:8000',
+    defaultValue: 'https://starless-dander-enjoyer.ngrok-free.dev/socket',
   );
 
   // Stockage sécurisé - clés

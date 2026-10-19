@@ -72,7 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Content de vous revoir',
+                  'Content de vous voir',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 6),
@@ -119,8 +119,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
 
                 AuthTextField(
-                  label: 'Numéro de téléphone',
-                  hint: '70 00 00 00',
+                  label: 'Numéro de téléphone *',
+                  hint: '70 09 70 00',
                   controller: _telephoneController,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icons.phone_outlined,
@@ -136,7 +136,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 18),
                 AuthTextField(
-                  label: 'Mot de passe',
+                  label: 'Mot de passe *',
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outline,

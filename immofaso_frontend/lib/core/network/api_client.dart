@@ -22,7 +22,8 @@ class ApiClient {
         baseUrl: AppConstants.apiBaseUrl,
         connectTimeout: AppConstants.connectTimeout,
         receiveTimeout: AppConstants.receiveTimeout,
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json','ngrok-skip-browser-warning': 'true',},
+        
       ),
     );
 

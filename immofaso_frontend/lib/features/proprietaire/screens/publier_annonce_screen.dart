@@ -215,14 +215,14 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _FieldLabel("Titre de l'annonce"),
+              _FieldLabel("Titre de l'annonce *"),
               TextFormField(
                 controller: _titreController,
                 decoration: const InputDecoration(hintText: 'Ex: Studio meublé, Villa 3 pièces...'),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Description'),
+              _FieldLabel('Description *'),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
@@ -230,7 +230,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Ville, quartier'),
+              _FieldLabel('Ville, quartier *'),
               TextFormField(
                 controller: _villeQuartierController,
                 decoration: const InputDecoration(
@@ -240,18 +240,18 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Surface'),
+              _FieldLabel('Surface *'),
               TextFormField(
                 controller: _surfaceController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  hintText: 'Surface',
+                  hintText: 'Surface *',
                   prefixIcon: Icon(Icons.rule_rounded),
                 ),
                 validator: (v) => (v == null || num.tryParse(v) == null) ? 'Surface invalide' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Type de logement'),
+              _FieldLabel('Type de logement *'),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -272,7 +272,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Nombre de pièces'),
+              _FieldLabel('Nombre de pièces *'),
               TextFormField(
                 controller: _piecesController,
                 keyboardType: TextInputType.number,
@@ -280,7 +280,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || int.tryParse(v) == null) ? 'Nombre invalide' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Budget mensuel'),
+              _FieldLabel('Budget mensuel *'),
               TextFormField(
                 controller: _budgetController,
                 keyboardType: TextInputType.number,
@@ -291,7 +291,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || num.tryParse(v) == null) ? 'Montant invalide' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Équipements'),
+              _FieldLabel('Équipements *'),
               ...Equipement.values.map((equipement) {
                 return CheckboxListTile(
                   value: _equipements.contains(equipement),

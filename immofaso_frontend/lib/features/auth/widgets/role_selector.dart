@@ -21,7 +21,7 @@ class RoleSelector extends StatelessWidget {
         Expanded(
           child: _RoleCard(
             label: 'Je cherche un logement',
-            subtitle: 'Locataire',
+            subtitle: 'Locataire *',
             icon: Icons.home_outlined,
             selected: selectedRole == UserRole.locataire,
             onTap: () => onChanged(UserRole.locataire),
@@ -31,7 +31,7 @@ class RoleSelector extends StatelessWidget {
         Expanded(
           child: _RoleCard(
             label: 'Je propose un logement',
-            subtitle: 'Propriétaire',
+            subtitle: 'Propriétaire *',
             icon: Icons.apartment_outlined,
             selected: selectedRole == UserRole.proprietaire,
             onTap: () => onChanged(UserRole.proprietaire),

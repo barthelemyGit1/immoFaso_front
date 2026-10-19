@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "483596475932",
+    "project_id": "immofaso-35b23",
+    "storage_bucket": "immofaso-35b23.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483596475932:android:37e1772b9366e5817049d9",
+        "android_client_info": {
+          "package_name": "com.example.immofaso_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs6FYkl-tG_gbvUTyx4UAXlcDV1jVElo4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
