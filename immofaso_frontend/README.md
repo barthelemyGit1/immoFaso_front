@@ -19,3 +19,5 @@ windows   1:483596475932:web:b3e9dfff248a5a657049d9
 Générer le app :  flutter build apk --release   
 Demarrer le tunel:  ngrok http --url=starless-dander-enjoyer.ngrok-free.dev 8000
 construire le logo de l'application :  dart run flutter_launcher_icons                                    
+
+
