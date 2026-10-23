@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/annonce_model.dart';
 import '../providers/proprietaire_providers.dart';
 import '../widgets/proprietaire_golden_button.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 /// Écran "NouvellesAnnonces" de la maquette. Sert à la fois pour publier
 /// une nouvelle annonce et pour en modifier une existante (si
@@ -207,6 +208,41 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
       appBar: AppBar(
         leading: const BackButton(),
         title: Text(widget.isEdition ? "Modifier l'annonce" : 'Annonce', style: const TextStyle(fontSize: 16)),
+        actions: [
+          TextButton.icon(
+            onPressed: () async {
+              // Remplacez ce lien par le lien d'invitation de votre groupe WhatsApp d'entreprise
+              const whatsappUrl = 'https://chat.whatsapp.com/JpTlrUDcbIM1212JWoV69t';
+              
+              try {
+                if (await canLaunchUrlString(whatsappUrl)) {
+                  await launchUrlString(
+                    whatsappUrl, 
+                    mode: LaunchMode.externalApplication,
+                  );
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Impossible d'ouvrir WhatsApp")),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Erreur : $e")),
+                  );
+                }
+              }
+            },
+            icon: const Icon(Icons.help_outline, size: 18, color: Colors.green),
+            label: const Text(
+              "Besoin d'aide?", 
+              style: TextStyle(color: Colors.green, fontSize: 13),
+            ),
+          ),
+          const SizedBox(width: 8), // Petit espace sur le bord droit
+        ],
       ),
       body: Form(
         key: _formKey,
@@ -215,14 +251,14 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _FieldLabel("Titre de l'annonce"),
+              _FieldLabel("Titre de l'annonce *"),
               TextFormField(
                 controller: _titreController,
                 decoration: const InputDecoration(hintText: 'Ex: Studio meublé, Villa 3 pièces...'),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Description'),
+              _FieldLabel('Description *'),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
@@ -230,7 +266,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Ville, quartier'),
+              _FieldLabel('Ville, quartier *'),
               TextFormField(
                 controller: _villeQuartierController,
                 decoration: const InputDecoration(
@@ -240,18 +276,18 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Surface'),
+              _FieldLabel('Surface *'),
               TextFormField(
                 controller: _surfaceController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  hintText: 'Surface',
+                  hintText: 'Surface *',
                   prefixIcon: Icon(Icons.rule_rounded),
                 ),
                 validator: (v) => (v == null || num.tryParse(v) == null) ? 'Surface invalide' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Type de logement'),
+              _FieldLabel('Type de logement *'),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -272,7 +308,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Nombre de pièces'),
+              _FieldLabel('Nombre de pièces *'),
               TextFormField(
                 controller: _piecesController,
                 keyboardType: TextInputType.number,
@@ -280,7 +316,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || int.tryParse(v) == null) ? 'Nombre invalide' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Budget mensuel'),
+              _FieldLabel('Budget mensuel *'),
               TextFormField(
                 controller: _budgetController,
                 keyboardType: TextInputType.number,
@@ -291,7 +327,7 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
                 validator: (v) => (v == null || num.tryParse(v) == null) ? 'Montant invalide' : null,
               ),
               const SizedBox(height: 18),
-              _FieldLabel('Équipements'),
+              _FieldLabel('Équipements *'),
               ...Equipement.values.map((equipement) {
                 return CheckboxListTile(
                   value: _equipements.contains(equipement),

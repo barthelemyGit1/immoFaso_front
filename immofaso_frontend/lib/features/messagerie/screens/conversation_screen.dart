@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
@@ -22,11 +24,36 @@ class ConversationScreen extends ConsumerStatefulWidget {
 class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final _messageController = TextEditingController();
   bool _isSending = false;
+  Timer? _rafraichissement;
+
+  @override
+  void initState() {
+    super.initState();
+    // Marque les messages reçus comme lus dès l'ouverture de l'écran.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _marquerLus());
+    _rafraichissement = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (mounted) ref.invalidate(messagesProvider(widget.conversation.id));
+    });
+  }
 
   @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
+    _rafraichissement?.cancel();
+  }
+
+  Future<void> _marquerLus() async {
+    try {
+      await ref
+          .read(conversationRepositoryProvider)
+          .marquerCommeLus(widget.conversation.id);
+      // On attend la réponse du serveur avant de recharger la liste,
+      // sinon le badge reviendrait avec l'ancien compteur.
+      ref.invalidate(conversationsProvider);
+    } catch (_) {
+      // Silencieux : un échec ne doit pas gêner la lecture.
+    }
   }
 
   Future<void> _envoyer() async {
@@ -35,7 +62,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
 
     setState(() => _isSending = true);
     try {
-      await ref.read(conversationRepositoryProvider).envoyerMessage(
+      await ref
+          .read(conversationRepositoryProvider)
+          .envoyerMessage(
             conversationId: widget.conversation.id,
             contenu: texte,
           );
@@ -44,7 +73,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Impossible d'envoyer le message."), backgroundColor: AppColors.error),
+        const SnackBar(
+          content: Text("Impossible d'envoyer le message."),
+          backgroundColor: AppColors.error,
+        ),
       );
     } finally {
       if (mounted) setState(() => _isSending = false);
@@ -68,13 +100,20 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             const CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.background,
-              child: Icon(Icons.person, size: 18, color: AppColors.textSecondary),
+              child: Icon(
+                Icons.person,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.conversation.interlocuteurNom, style: const TextStyle(fontSize: 15)),
+                Text(
+                  widget.conversation.interlocuteurNom,
+                  style: const TextStyle(fontSize: 15),
+                ),
                 Text(
                   widget.conversation.annonceTitre,
                   style: Theme.of(context).textTheme.bodySmall,
@@ -91,17 +130,24 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           Expanded(
             child: AsyncValueView<List<Message>>(
               value: messages,
-              onRetry: () => ref.invalidate(messagesProvider(widget.conversation.id)),
+              onRetry: () =>
+                  ref.invalidate(messagesProvider(widget.conversation.id)),
               isEmpty: (list) => list.isEmpty,
               emptyIcon: Icons.chat_bubble_outline_rounded,
               emptyTitle: 'Aucun message',
               emptyMessage: 'Démarrez la conversation en envoyant un message.',
               data: (context, msgs) => ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 itemCount: msgs.length,
                 itemBuilder: (context, index) {
                   final message = msgs[msgs.length - 1 - index];
-                  return MessageBubble(message: message, isMine: message.expediteurId == currentUserId);
+                  return MessageBubble(
+                    message: message,
+                    isMine: message.expediteurId == currentUserId,
+                  );
                 },
               ),
             ),
@@ -119,20 +165,34 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                       onSubmitted: (_) => _envoyer(),
                       decoration: InputDecoration(
                         hintText: 'Écrire un message...',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
                     onPressed: _isSending ? null : _envoyer,
-                    icon: _isSending ? const SizedBox( 
-                            
-                            height: 16, width: 16,
+                    icon: _isSending
+                        ? const SizedBox(
+                            height: 16,
+                            width: 16,
 
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.send_rounded),
-                            style: IconButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.send_rounded),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                 ],
               ),

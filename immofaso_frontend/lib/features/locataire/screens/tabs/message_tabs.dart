@@ -7,6 +7,7 @@ import '../../../../shared/widgets/async_value_view.dart';
 import '../../../messagerie/providers/conversation_providers.dart';
 import '../../../messagerie/screens/conversation_screen.dart';
 import '../../../../shared/widgets/brand_header.dart';
+import '../../../../shared/widgets/heure_et_coches.dart';
 
 class MessagesTab extends ConsumerWidget {
   const MessagesTab({super.key});
@@ -53,9 +54,10 @@ class MessagesTab extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          '${conversation.dernierMessageLe}',
-                          style: Theme.of(context).textTheme.bodySmall,
+                        HeureEtCoches(
+                          date: conversation.dernierMessageLe,
+                          estMien: conversation.dernierMessageEstMien,
+                          lu: conversation.dernierMessageLu,
                         ),
                         if (conversation.nonLus > 0) ...[
                           const SizedBox(height: 4),

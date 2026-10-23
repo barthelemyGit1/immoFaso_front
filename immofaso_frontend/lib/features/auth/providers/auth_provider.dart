@@ -88,13 +88,18 @@ class AuthController extends Notifier<AuthState> {
     return 'Une erreur est survenue. Réessayez plus tard.';
   }
 
-  Future<void> _tryRestoreSession() async {
-    state = const AuthLoading();
+ Future<void> _tryRestoreSession() async {
+  state = const AuthLoading();
+  try {
     final user = await _repository.restoreSession();
     state = user != null
         ? AuthAuthenticated(user)
         : const AuthUnauthenticated();
+  } catch (_) {
+    // Quoi qu'il arrive, on ne reste jamais bloqué sur le splash.
+    state = const AuthUnauthenticated();
   }
+}
 
   Future<void> login({
   required String telephone,

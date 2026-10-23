@@ -10,6 +10,7 @@ import '../../providers/proprietaire_providers.dart';
 import '../../widgets/mon_annonce_title.dart';
 import '../../widgets/stat_card.dart';
 import '../publier_annonce_screen.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 /// Écran "Accueil" de la maquette propriétaire : statistiques,
 /// bouton de publication, aperçu des annonces récentes.
@@ -65,6 +66,35 @@ class AccueilProprietaireTab extends ConsumerWidget {
                       icon: const Icon(Icons.add_circle_outline),
                       label: const Text('Publier une annonce'),
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDFAF2C)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text('Besoin d\'aide ?', style: Theme.of(context).textTheme.bodySmall),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        // Remplace ce lien par le lien d'invitation de ton groupe WhatsApp d'entreprise
+                        const whatsappUrl = 'https://chat.whatsapp.com/JpTlrUDcbIM1212JWoV69t';
+                        
+                        try {
+                          if (await canLaunchUrlString(whatsappUrl)) {
+                            await launchUrlString(
+                              whatsappUrl, 
+                              mode: LaunchMode.externalApplication, // Ouvre l'application WhatsApp externe
+                            );
+                          } else {
+                            // Gérer l'erreur si WhatsApp n'est pas installé ou si le lien est invalide
+                            print("Impossible d'ouvrir WhatsApp");
+                          }
+                        } catch (e) {
+                          print("Erreur : $e");
+                        }
+                      },
+                      icon: const Icon(Icons.help_outline_rounded),
+                      label: const Text('Demander de l\'aide'),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(192, 35, 146, 7)),
                     ),
                   ),
                   const SizedBox(height: 24),

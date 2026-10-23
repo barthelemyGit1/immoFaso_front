@@ -5,7 +5,7 @@ import '../../../core/theme/app_theme.dart';
 /// Figma (logo maison + silhouettes). À remplacer par les exports SVG/PNG
 /// définitifs de la maquette une fois disponibles (voir assets/images/).
 class AppLogoBadge extends StatelessWidget {
-  const AppLogoBadge({super.key, this.size = 90});
+  const AppLogoBadge({super.key, this.size = 160});
   final double size;
 
   @override
@@ -17,7 +17,11 @@ class AppLogoBadge extends StatelessWidget {
         color: AppColors.primary.withOpacity(0.08),
         shape: BoxShape.circle,
       ),
-      child: Image(image: const AssetImage('assets/icons/icon2.png'), width: size * 0.6, height: size * 0.6),
+      child: Image(
+        image: const AssetImage('assets/icons/icon2.png'),
+        width: size,
+        height: size,
+      ),
     );
   }
 }
@@ -43,7 +47,11 @@ class ProprietaireIllustration extends StatelessWidget {
               shape: BoxShape.circle,
             ),
           ),
-          Icon(Icons.holiday_village_rounded, size: 76, color: AppColors.secondary),
+          Icon(
+            Icons.holiday_village_rounded,
+            size: 76,
+            color: AppColors.secondary,
+          ),
           Positioned(
             bottom: 12,
             child: Row(
@@ -85,11 +93,19 @@ class LocataireIllustration extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.person_pin_circle_rounded, size: 60, color: AppColors.secondary),
+              const Icon(
+                Icons.person_pin_circle_rounded,
+                size: 60,
+                color: AppColors.secondary,
+              ),
               const SizedBox(width: 10),
               Icon(Icons.key_rounded, size: 34, color: AppColors.primary),
               const SizedBox(width: 6),
-              const Icon(Icons.house_rounded, size: 56, color: AppColors.primary),
+              const Icon(
+                Icons.house_rounded,
+                size: 56,
+                color: AppColors.primary,
+              ),
             ],
           ),
         ],
