@@ -28,10 +28,10 @@ class _NotificationsGateState extends ConsumerState<NotificationsGate> {
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
       if (next is AuthAuthenticated && previous is! AuthAuthenticated) {
         NotificationService.enregistrerToken((token) async {
-          //await ref.read(apiClientProvider).raw.post(
-          //  '#',
-          //  data: {'token': token, 'platform': 'android'},
-        //  );
+          await ref.read(apiClientProvider).raw.post(
+           '/device-tokens',
+           data: {'token': token, 'platform': 'android'},
+         );
         });
       }
     });

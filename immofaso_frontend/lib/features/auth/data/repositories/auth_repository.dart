@@ -6,7 +6,11 @@ import '../models/user_model.dart';
 
 /// Résultat d'une authentification réussie : token(s) + profil utilisateur.
 class AuthResult {
-  AuthResult({required this.user, required this.accessToken, required this.refreshToken});
+  AuthResult({
+    required this.user,
+    required this.accessToken,
+    required this.refreshToken,
+  });
   final UserModel user;
   final String accessToken;
   final String refreshToken;
@@ -23,9 +27,11 @@ class AuthResult {
 ///   POST /login
 ///   GET  /users/me           (routes/api.php, protégée par auth:sanctum)
 class AuthRepository {
-  AuthRepository({required ApiClient apiClient, required SecureStorageService storage})
-      : _api = apiClient,
-        _storage = storage;
+  AuthRepository({
+    required ApiClient apiClient,
+    required SecureStorageService storage,
+  }) : _api = apiClient,
+       _storage = storage;
 
   final ApiClient _api;
   final SecureStorageService _storage;
@@ -42,15 +48,18 @@ class AuthRepository {
     String? email,
   }) async {
     try {
-      final response = await _api.raw.post('/register', data: {
-        'nom': nom,
-        'prenom': prenom,
-        'telephone': telephone,
-        'password': password,
-        'password_confirmation': password,
-        'role': role.apiValue,
-        'email': email,
-      });
+      final response = await _api.raw.post(
+        '/register',
+        data: {
+          'nom': nom,
+          'prenom': prenom,
+          'telephone': telephone,
+          'password': password,
+          'password_confirmation': password,
+          'role': role.apiValue,
+          'email': email,
+        },
+      );
       return _extractOtpCode(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
@@ -66,10 +75,10 @@ class AuthRepository {
     required String otpCode,
   }) async {
     try {
-      final response = await _api.raw.post('/verify-otp', data: {
-        'telephone': telephone,
-        'otp': otpCode,
-      });
+      final response = await _api.raw.post(
+        '/verify-otp',
+        data: {'telephone': telephone, 'otp': otpCode},
+      );
       return _persistAndReturnSession(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
@@ -78,7 +87,10 @@ class AuthRepository {
 
   Future<String?> resendOtp({required String telephone}) async {
     try {
-      final response = await _api.raw.post('/resend-otp', data: {'telephone': telephone});
+      final response = await _api.raw.post(
+        '/resend-otp',
+        data: {'telephone': telephone},
+      );
       return _extractOtpCode(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
@@ -102,20 +114,22 @@ class AuthRepository {
       return _mockLogin(telephone: telephone);
     }*/
     try {
-      final response = await _api.raw.post('/login', data: {
-        'telephone': telephone,
-        'password': password,
-      });
+      final response = await _api.raw.post(
+        '/login',
+        data: {'telephone': telephone, 'password': password},
+      );
       return _persistAndReturnSession(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
   }
 
-
   Future<String?> forgotPassword({required String telephone}) async {
     try {
-      final response = await _api.raw.post('/password-reset', data: {'telephone': telephone});
+      final response = await _api.raw.post(
+        '/password-reset',
+        data: {'telephone': telephone},
+      );
       return _extractOtpCode(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
@@ -128,12 +142,15 @@ class AuthRepository {
     required String newPassword,
   }) async {
     try {
-      await _api.raw.post('/password-reset/confirm', data: {
-        'telephone': telephone,
-        'otp': otpCode,
-        'password': newPassword,
-        'password_confirmation': newPassword,
-      });
+      await _api.raw.post(
+        '/password-reset/confirm',
+        data: {
+          'telephone': telephone,
+          'otp': otpCode,
+          'password': newPassword,
+          'password_confirmation': newPassword,
+        },
+      );
     } on DioException catch (e) {
       throw ApiClient.mapError(e);
     }
@@ -155,23 +172,30 @@ class AuthRepository {
     final hasSession = await _storage.hasValidSession();
     if (!hasSession) return null;
 
-    if (AppConstants.useMockAuth) {
+    try {
+      final response = await _api.raw.get('/users/me');
+      final data = response.data as Map<String, dynamic>;
+      await _storage.saveCachedUserJson(response.data);
+      await _storage.readCachedUserJson();
+      return UserModel.fromJson(data);
+    } on DioException catch (e) {
+      // Token vraiment invalide : on nettoie la session.
+      if (e.response?.statusCode == 401) {
+        await _storage.clearSession();
+        return null;
+      }
+      // Réseau coupé ou serveur injoignable : on garde l'utilisateur connecté
+      // avec les dernières données connues.
       final cached = await _storage.readCachedUserJson();
       return cached != null ? UserModel.fromJson(cached) : null;
     }
-
-    try {
-      final response = await _api.raw.get('/user/me');
-      return UserModel.fromJson(response.data as Map<String, dynamic>);
-    } on DioException {
-      return null;
-    }
   }
 
-  Future<AuthResult> _persistAndReturnSession(Map<String, dynamic> responseBody) async {
-
+  Future<AuthResult> _persistAndReturnSession(
+    Map<String, dynamic> responseBody,
+  ) async {
     final data = responseBody['data'] as Map<String, dynamic>? ?? responseBody;
-  
+
     final userJson = data['user'] as Map<String, dynamic>;
     final user = UserModel.fromJson(userJson);
 
@@ -179,7 +203,8 @@ class AuthRepository {
     final accessToken = (data['token'] ?? data['accessToken'] ?? '') as String;
 
     // 4. Gestion sécurisée de refreshToken (mettre une chaîne vide si absent)
-    final refreshToken = (data['refreshToken'] ?? data['refresh_token'] ?? '') as String;
+    final refreshToken =
+        (data['refreshToken'] ?? data['refresh_token'] ?? '') as String;
 
     // 5. Sauvegarder la session
     await _storage.saveSession(
@@ -189,6 +214,10 @@ class AuthRepository {
       role: user.role.apiValue,
     );
 
-    return AuthResult(user: user, accessToken: accessToken, refreshToken: refreshToken);
+    return AuthResult(
+      user: user,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
   }
 }

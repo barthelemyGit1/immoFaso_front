@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 /// Entité MESSAGE — cf. dictionnaire de données.
 class Message {
   const Message({
@@ -24,7 +22,7 @@ class Message {
     expediteurId: json['id_expediteur'] as String,
     contenu: json['contenu'] as String? ?? '',
     envoyeLe: DateTime.parse(json['date_envoi'] as String),
-    lu: json['lu'] as bool? ?? false,
+    lu: json['lu'] == true || json['lu'] == 1,
   );
 }
 
@@ -38,7 +36,9 @@ class Conversation {
     required this.interlocuteurId,
     required this.interlocuteurNom,
     this.dernierMessage,
-    this.dernierMessageLe = false,
+    this.dernierMessageLe,
+    this.dernierMessageLu = false,
+    this.dernierMessageEstMien = false,
     this.nonLus = 0,
   });
 
@@ -48,7 +48,9 @@ class Conversation {
   final String interlocuteurId;
   final String interlocuteurNom;
   final String? dernierMessage;
-  final bool dernierMessageLe;
+  final DateTime? dernierMessageLe;
+  final bool dernierMessageLu;
+  final bool dernierMessageEstMien;
   final int nonLus;
 
   factory Conversation.fromJson(Map<String, dynamic> json) => Conversation(
@@ -58,7 +60,11 @@ class Conversation {
     interlocuteurId: json['interlocuteurId'] as String,
     interlocuteurNom: json['interlocuteurNom'] as String? ?? '',
     dernierMessage: json['dernierMessage'] as String?,
-    dernierMessageLe: json['dernierMessageLu'] as bool? ?? false,
+    dernierMessageLe: DateTime.tryParse('${json['dernierMessageLe'] ?? ''}'),
+    dernierMessageLu:
+        json['dernierMessageLu'] == true || json['dernierMessageLu'] == 1,
+    dernierMessageEstMien: json['dernierMessageEstMien'] == true ||
+        json['dernierMessageEstMien'] == 1,
     nonLus: json['nonLus'] as int? ?? 0,
   );
 }

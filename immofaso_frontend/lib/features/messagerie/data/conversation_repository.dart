@@ -60,4 +60,12 @@ class ConversationRepository {
       throw ApiClient.mapError(e);
     }
   }
+  /// Marque comme lus tous les messages reçus dans cette conversation.
+  Future<void> marquerCommeLus(String conversationId) async {
+    try {
+      await _api.raw.post('/conversations/$conversationId/lu');
+    } on DioException catch (e) {
+      throw ApiClient.mapError(e);
+    }
+  }
 }

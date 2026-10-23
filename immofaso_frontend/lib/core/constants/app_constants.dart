@@ -13,11 +13,13 @@ class AppConstants {
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'https://starless-dander-enjoyer.ngrok-free.dev/api/v1',
+    //defaultValue: 'http://10.0.2.2:8000/api/v1'
   );
 
   static const String socketUrl = String.fromEnvironment(
     'SOCKET_URL',
     defaultValue: 'https://starless-dander-enjoyer.ngrok-free.dev/socket',
+    //defaultValue: 'http://10.0.2.2:8000'
   );
 
   // Stockage sécurisé - clés

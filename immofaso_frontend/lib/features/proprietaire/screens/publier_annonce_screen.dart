@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/annonce_model.dart';
 import '../providers/proprietaire_providers.dart';
 import '../widgets/proprietaire_golden_button.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 /// Écran "NouvellesAnnonces" de la maquette. Sert à la fois pour publier
 /// une nouvelle annonce et pour en modifier une existante (si
@@ -207,6 +208,41 @@ class _PublierAnnonceScreenState extends ConsumerState<PublierAnnonceScreen> {
       appBar: AppBar(
         leading: const BackButton(),
         title: Text(widget.isEdition ? "Modifier l'annonce" : 'Annonce', style: const TextStyle(fontSize: 16)),
+        actions: [
+          TextButton.icon(
+            onPressed: () async {
+              // Remplacez ce lien par le lien d'invitation de votre groupe WhatsApp d'entreprise
+              const whatsappUrl = 'https://chat.whatsapp.com/JpTlrUDcbIM1212JWoV69t';
+              
+              try {
+                if (await canLaunchUrlString(whatsappUrl)) {
+                  await launchUrlString(
+                    whatsappUrl, 
+                    mode: LaunchMode.externalApplication,
+                  );
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Impossible d'ouvrir WhatsApp")),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Erreur : $e")),
+                  );
+                }
+              }
+            },
+            icon: const Icon(Icons.help_outline, size: 18, color: Colors.green),
+            label: const Text(
+              "Besoin d'aide?", 
+              style: TextStyle(color: Colors.green, fontSize: 13),
+            ),
+          ),
+          const SizedBox(width: 8), // Petit espace sur le bord droit
+        ],
       ),
       body: Form(
         key: _formKey,
