@@ -2,20 +2,28 @@
 class DashboardStats {
   const DashboardStats({
     required this.annoncesActives,
-    required this.vuesCeMois,
+    required this.vues,
+    required this.likes,
     required this.messagesNonLus,
-    required this.noteMoyenne,
   });
 
   final int annoncesActives;
-  final int vuesCeMois;
+  final int vues;
+  final int likes;
   final int messagesNonLus;
-  final double noteMoyenne;
 
-  factory DashboardStats.fromJson(Map<String, dynamic> json) => DashboardStats(
-        annoncesActives: json['annoncesActives'] as int? ?? 0,
-        vuesCeMois: json['vuesCeMois'] as int? ?? 0,
-        messagesNonLus: json['messagesNonLus'] as int? ?? 0,
-        noteMoyenne: (json['noteMoyenne'] as num?)?.toDouble() ?? 0,
-      );
+  /// Construit les stats depuis la réponse de GET /statistiques/proprietaire.
+  factory DashboardStats.fromJson(Map<String, dynamic> json) {
+    final annonces = json['annonces'] as List<dynamic>? ?? const [];
+    final actives = annonces
+        .where((a) => (a as Map<String, dynamic>)['statut'] == 'validee')
+        .length;
+
+    return DashboardStats(
+      annoncesActives: actives,
+      vues: (json['total_vues'] as num?)?.toInt() ?? 0,
+      likes: (json['total_likes'] as num?)?.toInt() ?? 0,
+      messagesNonLus: (json['total_messages_non_lus'] as num?)?.toInt() ?? 0,
+    );
+  }
 }

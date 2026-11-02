@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:immofaso_frontend/features/proprietaire/providers/proprietaire_providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/widgets/async_value_view.dart';
@@ -51,6 +52,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       // On attend la réponse du serveur avant de recharger la liste,
       // sinon le badge reviendrait avec l'ancien compteur.
       ref.invalidate(conversationsProvider);
+      ref.invalidate(dashboardStatsProvider);
     } catch (_) {
       // Silencieux : un échec ne doit pas gêner la lecture.
     }
