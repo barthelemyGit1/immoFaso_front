@@ -25,6 +25,7 @@ void main() async {
   runApp(const ProviderScope(child: ImmoFasoApp()));
 }
 
+
 class ImmoFasoApp extends ConsumerWidget {
   const ImmoFasoApp({super.key});
 
