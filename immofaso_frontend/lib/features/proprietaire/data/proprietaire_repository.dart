@@ -15,25 +15,16 @@ class ProprietaireRepository {
   /// on calcule "Annonces actives" à partir de `/annonces/all`. Les
   /// autres compteurs (vues, messages non lus, note moyenne) resteront à
   /// 0 tant que ces données ne sont pas exposées côté back.
+  /// Statistiques du propriétaire connecté : GET /statistiques/proprietaire.
   Future<DashboardStats> getDashboardStats() async {
-  try {
-    // 1. Récupération des annonces de l'utilisateur
-    final mesAnnonces = await getMesAnnonces();
-    final annoncesActives = mesAnnonces.where((a) => a.statut == StatutAnnonce.validee).length;
-    final vuesTotal = mesAnnonces.fold<int>(0, (sum, a) => sum + a.vues);
-    //int messagesNonLus = await getNombreMessagesNonLus();
-    //double noteMoyenne = await getNoteMoyenneUtilisateur();
-
-    return DashboardStats(
-      annoncesActives: annoncesActives,
-      vuesCeMois: vuesTotal,
-      messagesNonLus: 0,
-      noteMoyenne: 0.0,
-    );
-  } on DioException catch (e) {
-    throw ApiClient.mapError(e);
+    try {
+      final response = await _api.raw.get('/statistiques/mes-annonces');
+      final data = response.data['data'] as Map<String, dynamic>;
+      return DashboardStats.fromJson(data);
+    } on DioException catch (e) {
+      throw ApiClient.mapError(e);
+    }
   }
-}
 
   Future<List<Annonce>> getMesAnnonces() async {
     try {

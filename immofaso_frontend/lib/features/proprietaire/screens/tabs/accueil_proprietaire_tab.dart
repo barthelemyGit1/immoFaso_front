@@ -49,10 +49,28 @@ class AccueilProprietaireTab extends ConsumerWidget {
                       crossAxisSpacing: 12,
                       childAspectRatio: 1.7,
                       children: [
-                        StatCard(label: 'Annonces actives', value: '${s.annoncesActives}', icon: Icons.local_offer_outlined),
-                        StatCard(label: 'Vues ce mois', value: '${s.vuesCeMois}', icon: Icons.visibility_outlined),
-                        StatCard(label: 'Messages non lus', value: '${s.messagesNonLus}', icon: Icons.chat_bubble_outline, iconColor: AppColors.error),
-                        StatCard(label: 'Note moyenne', value: s.noteMoyenne.toStringAsFixed(1), icon: Icons.star_rounded, iconColor: AppColors.warning),
+                        StatCard(
+                          label: 'Annonces actives',
+                          value: '${s.annoncesActives}',
+                          icon: Icons.local_offer_outlined,
+                        ),
+                        StatCard(
+                          label: 'Vues',
+                          value: '${s.vues}',
+                          icon: Icons.visibility_outlined,
+                        ),
+                        StatCard(
+                          label: 'Likes',
+                          value: '${s.likes}',
+                          icon: Icons.favorite,
+                          iconColor: Colors.red,
+                        ),
+                        StatCard(
+                          label: 'Messages non lus',
+                          value: '${s.messagesNonLus}',
+                          icon: Icons.chat_bubble_outline,
+                          iconColor: AppColors.error,
+                        ),
                       ],
                     ),
                   ),

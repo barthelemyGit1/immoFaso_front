@@ -38,7 +38,7 @@ class ProfilProprietaireTab extends ConsumerWidget {
               children: [
                 const Icon(Icons.star_rounded, size: 16, color: AppColors.warning),
                 const SizedBox(width: 4),
-                Text('${s.noteMoyenne.toStringAsFixed(1)} / 5', style: Theme.of(context).textTheme.bodyMedium),
+                Text('${s.likes.toStringAsFixed(1)} ', style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
             loading: () => const SizedBox.shrink(),
